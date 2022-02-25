@@ -1,6 +1,6 @@
 # CA Micromouse
 
-We'll work on the GitHub repository during our next team meeting (Monday 2/21).
+Add important reference info here.
 
 # Accessing the Kanban Board
 

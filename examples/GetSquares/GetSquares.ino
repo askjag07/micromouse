@@ -2,7 +2,7 @@
 
 #include <HCSR04.h>
 
-HCSR04 front(5, 6);
+HCSR04[] hc = [ left(5, 6), front(7, 8), right(9, 10) ];
 
 void setup()
 {
@@ -14,7 +14,7 @@ void loop()
 {
 }
 
-byte getSquares()
+byte getSquares(byte d)
 {
-  return (byte)round(front.dist() / 25.4);
+  return (byte)round(hc[d].dist() / 25.4);
 }

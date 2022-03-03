@@ -7,14 +7,14 @@ HCSR04 hc(5, 6);
 void setup()
 {
   Serial.begin(38400);
-  Serial.println(getDist());
+  Serial.println(getSquares());
 }
 
 void loop()
 {
 }
 
-int getDist()
+int getSquares()
 {
   return (int)round(hc.dist() / 25.4) * 10;
 }

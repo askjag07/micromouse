@@ -2,12 +2,15 @@
 
 #include <Encoder.h>
 #include <SoftwareSerial.h>
+#include <HCSR04.h>
 
 SoftwareSerial serial(7, 8);
 Encoder e(18, 19);
+HCSR04 hc(5, 6);
 
 void setup()
 {
+  Serial.begin(38400);
   serial.begin(19200);
   moveSquares(1);
 }
@@ -16,15 +19,20 @@ void loop()
 {
 }
 
+int getSquares()
+{
+  return (int)round(hc.dist() / 25.4);
+}
+
 void moveSquares(byte num)
 {
   for (byte i = 0; i < num; i++)
   {
-    byte numHoles = 0;
+    int numHoles = 0;
     bool encValue = 0;
     serial.write(127);
     serial.write(255);
-    while (numHoles <= 150)
+    while (numHoles <= 280)
       if (e.read() != encValue)
       {
         encValue = e.read();
@@ -34,6 +42,7 @@ void moveSquares(byte num)
           encValue = 0;
         }
       }
+    Serial.println(numHoles);
     serial.write(64);
     serial.write(192);
   }

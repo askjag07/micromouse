@@ -12,25 +12,79 @@ HCSR04 front(5, 6);
 HCSR04 right(9, 10);
 HCSR04 hc[] = {left, front, right};
 
+struct squares[10][10];
+byte row = 0, col = 0;
+// 0 is up, 1 is right, 2 is down, 3 is left
+byte dir = 1;
+
+// sets back wall of first square to closed
+squares[0][0].s2 = 1;
+
 void setup()
 {
   serial.begin(19200);
-  while (true)
-  {
-    moveSquares(getSquares(1), false);
-    if (getSquares(0) > 0)
-      turn(true);
-    else if (getSquares(2) > 0)
-      turn(false);
-    else
-      break;
-  }
+  
 }
 
 void loop()
 {
+  setSquare();
+
 }
 
+void setSquare() {
+  if(dir == 0) {
+    if(getSquares(0) > 0) squares[row][col].left = 1;
+    else squares[row][col].left = 0;
+    if(getSquares(1) > 0) squares[row][col].up = 1;
+    else squares[row][col].up = 0;
+    if(getSquares(2) > 0) squares[row][col].right = 1;
+    else squares[row][col].right = 0;
+  }
+  else if(dir == 1) {
+    if(getSquares(0) > 0) squares[row][col].up = 1;
+    else squares[row][col].up = 0;
+    if(getSquares(1) > 0) squares[row][col].right = 1;
+    else squares[row][col].right = 0;
+    if(getSquares(2) > 0) squares[row][col].down = 1;
+    else squares[row][col].down = 0;
+  }
+  else if(dir == 2) {
+    if(getSquares(0) > 0) squares[row][col].right = 1;
+    else squares[row][col].right = 0;
+    if(getSquares(1) > 0) squares[row][col].down = 1;
+    else squares[row][col].down = 0;
+    if(getSquares(2) > 0) squares[row][col].left = 1;
+    else squares[row][col].left = 0;
+  }
+  else {
+    if(getSquares(0) > 0) squares[row][col].down = 1;
+    else squares[row][col].down = 0;
+    if(getSquares(1) > 0) squares[row][col].left = 1;
+    else squares[row][col].left = 0;
+    if(getSquares(2) > 0) squares[row][col].up = 1;
+    else squares[row][col].up = 0;
+  }
+  /*
+  if(row > 0) squares[row-1][col].down = squares[row][col].up;
+  if(row < 9) squares[row+1][col].down = squares[row][col].up;
+  if(col > 0) squares[row-1][col].down = squares[row][col].up;
+  if(col < 9) squares[row-1][col].down = squares[row][col].up;
+  */
+}
+
+pair<byte,byte> checkWin() {
+  for(byte r = 0; r < 9; r++) {
+    for(byte c = 0; c < 9; c++) {
+      if(squares[r][c].right == 0 && squares[r][c].down == 0 && squares[r+1][c].up == 0 && squares[r+1][c].right == 0 && 
+          squares[r][c+1].left == 0 && squares[r][c+1].down == 0 && squares[r+1][c+1].up == 0 && squares[r+1][c+1].left == 0) {
+        return make_pair(r,c);
+      }
+    }
+  } 
+}
+
+// 0 is left, 1 is front, 2 is right
 byte getSquares(byte d)
 {
   return rnd(hc[d].dist() / 25.4);
@@ -103,3 +157,10 @@ int rnd(float n)
   else
     return (int)n + 1;
 }
+
+// top is side0, go clockwise
+struct square {
+  // 1 is wall, 0 is no wall, 2 is don't know
+  byte up = 2, right = 2, down = 2, left = 2;
+  
+};

@@ -1,5 +1,3 @@
-/* Moves forward one revolution with 3s breaks */
-
 #include <SoftwareSerial.h>
 #include <Encoder.h>
 #include <HCSR04.h>
@@ -12,17 +10,28 @@ HCSR04 front(5, 6);
 HCSR04 right(9, 10);
 HCSR04 hc[] = {left, front, right};
 
-struct squares[10][10];
+struct Square
+{
+  // 1 is wall, 0 is no wall, 2 is don't know
+  byte up = 2, right = 2, down = 2, left = 2;
+
+  Square() {
+    up = 2, right = 2, down = 2, left = 2;
+  }
+};
+
+Square squares[10][10];
 byte row = 0, col = 0;
 // 0 is up, 1 is right, 2 is down, 3 is left
 byte dir = 1;
 
-// sets back wall of first square to closed
-squares[0][0].s2 = 1;
+byte winX = -1, winY = -1;
 
 void setup()
 {
   serial.begin(19200);
+  // sets back wall of first square to closed
+  squares[0][0].down = 1;
 }
 
 void loop()
@@ -100,7 +109,7 @@ void setSquare()
   */
 }
 
-pair<byte, byte> checkWin()
+bool checkWin()
 {
   for (byte r = 0; r < 9; r++)
   {
@@ -109,10 +118,13 @@ pair<byte, byte> checkWin()
       if (squares[r][c].right == 0 && squares[r][c].down == 0 && squares[r + 1][c].up == 0 && squares[r + 1][c].right == 0 &&
           squares[r][c + 1].left == 0 && squares[r][c + 1].down == 0 && squares[r + 1][c + 1].up == 0 && squares[r + 1][c + 1].left == 0)
       {
-        return make_pair(r, c);
+        winX = r;
+        winY = c;
+        return true;
       }
     }
   }
+  return false;
 }
 
 // 0 is left, 1 is front, 2 is right
@@ -188,10 +200,3 @@ int rnd(float n)
   else
     return (int)n + 1;
 }
-
-// top is side0, go clockwise
-struct square
-{
-  // 1 is wall, 0 is no wall, 2 is don't know
-  byte up = 2, right = 2, down = 2, left = 2;
-};

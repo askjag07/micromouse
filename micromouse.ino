@@ -15,11 +15,7 @@ struct Square
 {
   // 1 is wall, 0 is no wall, 2 is don't know
   byte up = 2, right = 2, down = 2, left = 2;
-
-  Square()
-  {
-    up = 2, right = 2, down = 2, left = 2;
-  }
+  bool visited = false;
 };
 
 struct Stack
@@ -65,8 +61,9 @@ byte winX = -1, winY = -1;
 void setup()
 {
   serial.begin(19200);
-  // sets back wall of first square to closed
+  // sets back wall of first square to closed and marks it as visited
   squares[0][0].down = 1;
+  squares[0][0].visited = true;
   explore();
 }
 
@@ -114,26 +111,26 @@ void explore()
     nextLoc.push_back(row);
     nextLoc.push_back(col + 1);
 
-    // pushes to toVisit if we haven't visited it yet
-    if (rightOpen && (squares[nextLoc[0]][nextLoc[1]].up != 2 || squares[nextLoc[0]][nextLoc[1]].down != 2 || squares[nextLoc[0]][nextLoc[1]].right != 2 || squares[nextLoc[0]][nextLoc[1]].left != 2))
+    // pushes locations to toVisit if we haven't visited them yet and they're open
+    if (rightOpen && squares[nextLoc[0]][nextLoc[1]].visited == false)
     {
       toVisit.push(nextLoc);
     }
     nextLoc[0] = row;
     nextLoc[1] = col - 1;
-    if (leftOpen && (squares[nextLoc[0]][nextLoc[1]].up != 2 || squares[nextLoc[0]][nextLoc[1]].down != 2 || squares[nextLoc[0]][nextLoc[1]].right != 2 || squares[nextLoc[0]][nextLoc[1]].left != 2))
+    if (leftOpen && squares[nextLoc[0]][nextLoc[1]].visited == false)
     {
       toVisit.push(nextLoc);
     }
     nextLoc[0] = row + 1;
     nextLoc[1] = col;
-    if (downOpen && (squares[nextLoc[0]][nextLoc[1]].up != 2 || squares[nextLoc[0]][nextLoc[1]].down != 2 || squares[nextLoc[0]][nextLoc[1]].right != 2 || squares[nextLoc[0]][nextLoc[1]].left != 2))
+    if (downOpen && squares[nextLoc[0]][nextLoc[1]].visited == false)
     {
       toVisit.push(nextLoc);
     }
     nextLoc[0] = row - 1;
     nextLoc[1] = col;
-    if (upOpen && (squares[nextLoc[0]][nextLoc[1]].up != 2 || squares[nextLoc[0]][nextLoc[1]].down != 2 || squares[nextLoc[0]][nextLoc[1]].right != 2 || squares[nextLoc[0]][nextLoc[1]].left != 2))
+    if (upOpen && squares[nextLoc[0]][nextLoc[1]].visited == false)
     {
       toVisit.push(nextLoc);
     }
@@ -254,6 +251,8 @@ void moveTo(int r, int c)
     moveTo(curr[0], curr[1]);
     moveTo(r, c);
   }
+  // marks target square as visited
+  squares[r][c].visited = true;
 }
 
 void setSquare()
@@ -318,12 +317,12 @@ void setSquare()
     else
       squares[row][col].up = 0;
   }
-  /*
+  // updates adjacent squares
   if(row > 0) squares[row-1][col].down = squares[row][col].up;
-  if(row < 9) squares[row+1][col].down = squares[row][col].up;
-  if(col > 0) squares[row-1][col].down = squares[row][col].up;
-  if(col < 9) squares[row-1][col].down = squares[row][col].up;
-  */
+  if(row < 9) squares[row+1][col].up = squares[row][col].down;
+  if(col > 0) squares[row][col-1].right = squares[row][col].left;
+  if(col < 9) squares[row][col+1].left = squares[row][col].right;
+
 }
 
 bool checkWin()

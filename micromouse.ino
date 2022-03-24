@@ -65,6 +65,7 @@ void setup()
   serial.begin(19200);
   // sets back wall of first square to closed
   squares[0][0].down = 1;
+  explore();
 }
 
 void loop()

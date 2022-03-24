@@ -17,33 +17,37 @@ struct Square
   // 1 is wall, 0 is no wall, 2 is don't know
   byte up = 2, right = 2, down = 2, left = 2;
 
-  Square() {
+  Square()
+  {
     up = 2, right = 2, down = 2, left = 2;
   }
 };
 
-struct Stack 
+struct Stack
 {
   Vector<Vector<int>> stack;
 
-  bool isEmpty() {
+  bool isEmpty()
+  {
     return stack.size() == 0;
   }
 
-  void push(Vector<int> v) {
+  void push(Vector<int> v)
+  {
     stack.push_back(v);
   }
 
-  Vector<int> pop() {
-    Vector<int> val = stack[stack.size()-1];
+  Vector<int> pop()
+  {
+    Vector<int> val = stack[stack.size() - 1];
     stack.pop_back();
     return val;
   }
 
-  Vector<int> peek() {
-    return stack[stack.size()-1];
+  Vector<int> peek()
+  {
+    return stack[stack.size() - 1];
   }
-
 };
 
 Square squares[10][10];
@@ -61,33 +65,36 @@ void setup()
   serial.begin(19200);
   // sets back wall of first square to closed
   squares[0][0].down = 1;
-  
 }
 
 void loop()
 {
-  
 }
 
-void explore() {
+void explore()
+{
   Stack toVisit;
   byte counter = 0;
-  
-  while(true) {
+
+  while (true)
+  {
 
     // update data abount current square
     setSquare();
 
     // update trail, which is used for backtracking
     Vector<int> vect;
-    vect.push_back(row); vect.push_back(col);
+    vect.push_back(row);
+    vect.push_back(col);
     trail.push(vect);
 
     // if we found the middle, break out of loop
     counter++;
     counter %= 6;
-    if(counter == 5) {
-      if(checkWin) {
+    if (counter == 5)
+    {
+      if (checkWin)
+      {
         break;
       }
     }
@@ -98,27 +105,39 @@ void explore() {
     bool upOpen = squares[row][col].up == 0;
 
     Vector<int> nextLoc;
-    nextLoc.push_back(row); nextLoc.push_back(col+1);
+    nextLoc.push_back(row);
+    nextLoc.push_back(col + 1);
     Vector<int> toPush;
-    toPush.push_back(-1); toPush.push_back(-1);
+    toPush.push_back(-1);
+    toPush.push_back(-1);
 
-    if(rightOpen && (squares[nextLoc[0]][nextLoc[1]].up != 2 || squares[nextLoc[0]][nextLoc[1]].down != 2 || squares[nextLoc[0]][nextLoc[1]].right != 2 || squares[nextLoc[0]][nextLoc[1]].left != 2)) {
-      toPush[0] = row; toPush[1] = col+1;
+    if (rightOpen && (squares[nextLoc[0]][nextLoc[1]].up != 2 || squares[nextLoc[0]][nextLoc[1]].down != 2 || squares[nextLoc[0]][nextLoc[1]].right != 2 || squares[nextLoc[0]][nextLoc[1]].left != 2))
+    {
+      toPush[0] = row;
+      toPush[1] = col + 1;
       toVisit.push(toPush);
     }
-    nextLoc[1] = col-1;
-    if(leftOpen && (squares[nextLoc[0]][nextLoc[1]].up != 2 || squares[nextLoc[0]][nextLoc[1]].down != 2 || squares[nextLoc[0]][nextLoc[1]].right != 2 || squares[nextLoc[0]][nextLoc[1]].left != 2)) {
-      toPush[0] = row; toPush[1] = col-1;
+    nextLoc[1] = col - 1;
+    if (leftOpen && (squares[nextLoc[0]][nextLoc[1]].up != 2 || squares[nextLoc[0]][nextLoc[1]].down != 2 || squares[nextLoc[0]][nextLoc[1]].right != 2 || squares[nextLoc[0]][nextLoc[1]].left != 2))
+    {
+      toPush[0] = row;
+      toPush[1] = col - 1;
       toVisit.push(toPush);
     }
-    nextLoc[0] = row+1; nextLoc[1] = col;
-    if(downOpen && (squares[nextLoc[0]][nextLoc[1]].up != 2 || squares[nextLoc[0]][nextLoc[1]].down != 2 || squares[nextLoc[0]][nextLoc[1]].right != 2 || squares[nextLoc[0]][nextLoc[1]].left != 2)) {
-      toPush[0] = row+1; toPush[1] = col;
+    nextLoc[0] = row + 1;
+    nextLoc[1] = col;
+    if (downOpen && (squares[nextLoc[0]][nextLoc[1]].up != 2 || squares[nextLoc[0]][nextLoc[1]].down != 2 || squares[nextLoc[0]][nextLoc[1]].right != 2 || squares[nextLoc[0]][nextLoc[1]].left != 2))
+    {
+      toPush[0] = row + 1;
+      toPush[1] = col;
       toVisit.push(toPush);
     }
-    nextLoc[0] = row-1; nextLoc[1] = col;
-    if(upOpen && (squares[nextLoc[0]][nextLoc[1]].up != 2 || squares[nextLoc[0]][nextLoc[1]].down != 2 || squares[nextLoc[0]][nextLoc[1]].right != 2 || squares[nextLoc[0]][nextLoc[1]].left != 2)) {
-      toPush[0] = row-1; toPush[1] = col;
+    nextLoc[0] = row - 1;
+    nextLoc[1] = col;
+    if (upOpen && (squares[nextLoc[0]][nextLoc[1]].up != 2 || squares[nextLoc[0]][nextLoc[1]].down != 2 || squares[nextLoc[0]][nextLoc[1]].right != 2 || squares[nextLoc[0]][nextLoc[1]].left != 2))
+    {
+      toPush[0] = row - 1;
+      toPush[1] = col;
       toVisit.push(toPush);
     }
     Vector<int> next = toVisit.pop();
@@ -127,84 +146,112 @@ void explore() {
 }
 
 // 0 is up, 1 is right, 2 is down, 3 is left
-void moveTo(int r, int c) {
-  if(((r == row-1 || r == row+1) && c == col) || ((c == col-1 || c == col+1) && r == row)) {
-    if(r == row-1) {
-      if(dir == 0) {
-        moveSquares(1,false);
-      }
-      else if(dir == 1) {
-        turn(true);
-        moveSquares(1,false);
-      }
-      else if(dir == 2) {
-        turn(true); turn(true);
+void moveTo(int r, int c)
+{
+  if (((r == row - 1 || r == row + 1) && c == col) || ((c == col - 1 || c == col + 1) && r == row))
+  {
+    if (r == row - 1)
+    {
+      if (dir == 0)
+      {
         moveSquares(1, false);
       }
-      else {
+      else if (dir == 1)
+      {
+        turn(true);
+        moveSquares(1, false);
+      }
+      else if (dir == 2)
+      {
+        turn(true);
+        turn(true);
+        moveSquares(1, false);
+      }
+      else
+      {
         turn(false);
         moveSquares(1, false);
       }
     }
-    if(r == row+1) {
-      if(dir == 0) {
-        turn(true); turn(true);
-        moveSquares(1,false);
-      }
-      else if(dir == 1) {
-        turn(false);
-        moveSquares(1,false);
-      }
-      else if(dir == 2) {
+    if (r == row + 1)
+    {
+      if (dir == 0)
+      {
+        turn(true);
+        turn(true);
         moveSquares(1, false);
       }
-      else {
+      else if (dir == 1)
+      {
+        turn(false);
+        moveSquares(1, false);
+      }
+      else if (dir == 2)
+      {
+        moveSquares(1, false);
+      }
+      else
+      {
         turn(true);
         moveSquares(1, false);
       }
     }
-    if(c == col+1) {
-      if(dir == 0) {
+    if (c == col + 1)
+    {
+      if (dir == 0)
+      {
         turn(false);
-        moveSquares(1,false);
+        moveSquares(1, false);
       }
-      else if(dir == 1) {
-        moveSquares(1,false);
+      else if (dir == 1)
+      {
+        moveSquares(1, false);
       }
-      else if(dir == 2) {
+      else if (dir == 2)
+      {
         turn(true);
         moveSquares(1, false);
       }
-      else {
-        turn(true); turn(true);
+      else
+      {
+        turn(true);
+        turn(true);
         moveSquares(1, false);
       }
     }
-    if(c == col-1) {
-      if(dir == 0) {
+    if (c == col - 1)
+    {
+      if (dir == 0)
+      {
         turn(true);
-        moveSquares(1,false);
+        moveSquares(1, false);
       }
-      else if(dir == 1) {
-        turn(false); turn(false);
-        moveSquares(1,false);
-      }
-      else if(dir == 2) {
+      else if (dir == 1)
+      {
+        turn(false);
         turn(false);
         moveSquares(1, false);
       }
-      else {
+      else if (dir == 2)
+      {
+        turn(false);
+        moveSquares(1, false);
+      }
+      else
+      {
         moveSquares(1, false);
       }
     }
   }
-  else {
+  else
+  {
     Vector<int> curr = trail.pop();
-    while(!((curr[0] == r-1 || curr[0] == r+1) && curr[1] == c) || ((curr[1] == c-1 || curr[1] == c+1) && curr[0] == r)) {
+    while (!((curr[0] == r - 1 || curr[0] == r + 1) && curr[1] == c) || ((curr[1] == c - 1 || curr[1] == c + 1) && curr[0] == r))
+    {
       moveTo(curr[0], curr[1]);
       curr = trail.pop();
     }
-    moveTo(curr[0],curr[1]);
+    moveTo(curr[0], curr[1]);
     moveTo(r, c);
   }
 }
@@ -300,34 +347,31 @@ bool checkWin()
 // 0 is left, 1 is front, 2 is right
 byte getSquares(byte d)
 {
-  return rnd(hc[d].dist() / 25.4);
+  return floor(hc[d].dist() / 23.495);
 }
 
 void moveSquares(byte squares, bool b)
 {
-  for (byte i = 0; i < squares; i++)
-  {
-    int numHoles = 0;
-    byte encValue = 0;
+  int numHoles = 0;
+  byte encValue = 0;
 
-    serial.write(b ? 1 : 127);
-    serial.write(b ? 128 : 255);
-    while (numHoles <= (b ? 50 : 303))
+  serial.write(b ? 1 : 127);   // left
+  serial.write(b ? 128 : 251); // right
+  while (numHoles <= (b ? 50 : 330 * squares))
+  {
+    if (e.read() != encValue)
     {
-      if (e.read() != encValue)
+      encValue = e.read();
+      if (encValue == 0)
       {
-        encValue = e.read();
-        if (encValue == 0)
-        {
-          numHoles++;
-          encValue = 0;
-        }
+        numHoles++;
+        encValue = 0;
       }
     }
-    serial.write(64);
-    serial.write(192);
-    delay(1000);
   }
+  serial.write(64);
+  serial.write(192);
+  delay(1000);
 }
 
 // 0 is up, 1 is right, 2 is down, 3 is left
@@ -336,20 +380,21 @@ void turn(bool left)
   int numHoles = 0;
   byte encValue = 0;
 
-
   if (left)
   {
-    if(--dir < 0) dir = 3;
+    if (--dir < 0)
+      dir = 3;
     serial.write(127);
     serial.write(128);
   }
   else
   {
-    if(++dir > 3) dir = 0;
+    if (++dir > 3)
+      dir = 0;
     serial.write(1);
     serial.write(255);
   }
-  while (numHoles <= (left ? 95 : 80))
+  while (numHoles <= 150)
   {
     if (e.read() != encValue)
     {

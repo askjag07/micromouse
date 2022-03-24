@@ -372,6 +372,18 @@ void moveSquares(byte squares, bool b)
   }
   serial.write(64);
   serial.write(192);
+  if (dir == 0) {
+    row -= squares;
+  }
+  else if (dir == 2) {
+    row += squares;
+  }
+  else if (dir == 1) {
+    col += squares;
+  }
+  else {
+    col -= squares;
+  }
   delay(1000);
 }
 

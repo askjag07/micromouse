@@ -1,7 +1,6 @@
 #include <SoftwareSerial.h>
 #include <Encoder.h>
 #include <HCSR04.h>
-
 #include <Vector.h>
 
 SoftwareSerial serial(7, 8);
@@ -50,14 +49,17 @@ struct Stack
   }
 };
 
+// represents the maze as 2d array of squares
 Square squares[10][10];
+// trail/path of the robot, used for backtracking purposes
 Stack trail;
 
-// location of the bots
+// location of the bot (starts at top left corner)
 int row = 0, col = 0;
-// 0 is up, 1 is right, 2 is down, 3 is left
+// 0 is up, 1 is right, 2 is down, 3 is left (starts facing right)
 byte dir = 1;
 
+// coords of middle/winning square (updated in checkWin)
 byte winX = -1, winY = -1;
 
 void setup()
@@ -72,9 +74,12 @@ void loop()
 {
 }
 
+// explores the maze, gathering data and finding the winning square
 void explore()
 {
+  // stack of squares we want to visit next
   Stack toVisit;
+  // counter for checkWin
   byte counter = 0;
 
   while (true)
@@ -89,7 +94,7 @@ void explore()
     vect.push_back(col);
     trail.push(vect);
 
-    // if we found the middle, break out of loop
+    // check for the middle every 6 moves. if we found the middle, break out of the loop
     counter++;
     counter %= 6;
     if (counter == 5)
@@ -108,39 +113,31 @@ void explore()
     Vector<int> nextLoc;
     nextLoc.push_back(row);
     nextLoc.push_back(col + 1);
-    Vector<int> toPush;
-    toPush.push_back(-1);
-    toPush.push_back(-1);
 
+    // pushes to toVisit if we haven't visited it yet
     if (rightOpen && (squares[nextLoc[0]][nextLoc[1]].up != 2 || squares[nextLoc[0]][nextLoc[1]].down != 2 || squares[nextLoc[0]][nextLoc[1]].right != 2 || squares[nextLoc[0]][nextLoc[1]].left != 2))
     {
-      toPush[0] = row;
-      toPush[1] = col + 1;
-      toVisit.push(toPush);
+      toVisit.push(nextLoc);
     }
+    nextLoc[0] = row;
     nextLoc[1] = col - 1;
     if (leftOpen && (squares[nextLoc[0]][nextLoc[1]].up != 2 || squares[nextLoc[0]][nextLoc[1]].down != 2 || squares[nextLoc[0]][nextLoc[1]].right != 2 || squares[nextLoc[0]][nextLoc[1]].left != 2))
     {
-      toPush[0] = row;
-      toPush[1] = col - 1;
-      toVisit.push(toPush);
+      toVisit.push(nextLoc);
     }
     nextLoc[0] = row + 1;
     nextLoc[1] = col;
     if (downOpen && (squares[nextLoc[0]][nextLoc[1]].up != 2 || squares[nextLoc[0]][nextLoc[1]].down != 2 || squares[nextLoc[0]][nextLoc[1]].right != 2 || squares[nextLoc[0]][nextLoc[1]].left != 2))
     {
-      toPush[0] = row + 1;
-      toPush[1] = col;
-      toVisit.push(toPush);
+      toVisit.push(nextLoc);
     }
     nextLoc[0] = row - 1;
     nextLoc[1] = col;
     if (upOpen && (squares[nextLoc[0]][nextLoc[1]].up != 2 || squares[nextLoc[0]][nextLoc[1]].down != 2 || squares[nextLoc[0]][nextLoc[1]].right != 2 || squares[nextLoc[0]][nextLoc[1]].left != 2))
     {
-      toPush[0] = row - 1;
-      toPush[1] = col;
-      toVisit.push(toPush);
+      toVisit.push(nextLoc);
     }
+    // move to the first location on the stack
     Vector<int> next = toVisit.pop();
     moveTo(next[0], next[1]);
   }
@@ -149,6 +146,7 @@ void explore()
 // 0 is up, 1 is right, 2 is down, 3 is left
 void moveTo(int r, int c)
 {
+  // if the target square is adjacent to the current square
   if (((r == row - 1 || r == row + 1) && c == col) || ((c == col - 1 || c == col + 1) && r == row))
   {
     if (r == row - 1)
@@ -244,6 +242,7 @@ void moveTo(int r, int c)
       }
     }
   }
+  // if the target square is not adjacent to the current square, backtrack along trail
   else
   {
     Vector<int> curr = trail.pop();

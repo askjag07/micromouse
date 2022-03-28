@@ -368,11 +368,11 @@ byte getSquares(byte d)
 void moveSquares(byte squares, bool b)
 {
   int numHoles = 0;
-  byte encValue = 0, ls = 127, rs = 252;
+  byte encValue = 0, ls = 100, rs = 225;
 
   serial.write(b ? 1 : ls);   // left
   serial.write(b ? 128 : rs); // right
-  while (numHoles <= (b ? 50 : 215))
+  while (numHoles <= (b ? 100 : 310))
   {
     if (squares % 300 == 150 && !b)
     {
@@ -450,7 +450,7 @@ void turn(bool left)
     serial.write(127);
     serial.write(128);
   }
-  while (numHoles <= 124)
+  while (numHoles <= 128)
   {
     if (e.read() != encValue)
     {

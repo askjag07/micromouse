@@ -21,28 +21,26 @@ struct Square
 struct Stack
 {
 
-  int storage_array[100];
-  Vector<Vector<int>> stack;
-  stack.setStorage(storage_array)
+  Array<Array<int,2>,100> stack;
 
   bool isEmpty()
   {
     return stack.size() == 0;
   }
 
-  void push(Vector<int> v)
+  void push(Array<int,2> v)
   {
     stack.push_back(v);
   }
 
-  Vector<int> pop()
+  Array<int,2> pop()
   {
-    Vector<int> val = stack[stack.size() - 1];
+    Array<int,2> val = stack[stack.size() - 1];
     stack.pop_back();
     return val;
   }
 
-  Vector<int> peek()
+  Array<int,2> peek()
   {
     return stack[stack.size() - 1];
   }
@@ -93,7 +91,7 @@ void explore()
     setSquare();
 
     // update trail, which is used for backtracking
-    Vector<int> vect;
+    Array<int,2> vect;
     vect.push_back(row);
     vect.push_back(col);
     trail.push(vect);
@@ -114,8 +112,9 @@ void explore()
     bool downOpen = squares[row][col].down == 0;
     bool upOpen = squares[row][col].up == 0;
 
-    int temp[2] = {row, col+1};
-    Vector<int> nextLoc(temp, 2);
+    Array<int,2> nextLoc;
+    nextLoc[0] = row;
+    nextLoc[1] = col+1;
 
     // pushes locations to toVisit if we haven't visited them yet and they're open
     if (rightOpen && squares[nextLoc[0]][nextLoc[1]].visited == false)
@@ -148,7 +147,7 @@ void explore()
       toVisit.push(nextLoc);
     }
     // move to the first location on the stack
-    Vector<int> next = toVisit.pop();
+    Array<int,2> next = toVisit.pop();
     moveTo(next[0], next[1]);
     delay(10000);
   }
@@ -256,7 +255,7 @@ void moveTo(int r, int c)
   // if the target square is not adjacent to the current square, backtrack along trail
   else
   {
-    Vector<int> curr = trail.pop();
+    Array<int,2> curr = trail.pop();
     while (!((curr[0] == r - 1 || curr[0] == r + 1) && curr[1] == c) || ((curr[1] == c - 1 || curr[1] == c + 1) && curr[0] == r))
     {
       moveTo(curr[0], curr[1]);

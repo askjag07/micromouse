@@ -20,6 +20,7 @@ struct Square
 
 struct Stack
 {
+
   Vector<Vector<int>> stack;
 
   bool isEmpty()
@@ -44,7 +45,13 @@ struct Stack
     return stack[stack.size() - 1];
   }
 
+<<<<<<< HEAD
 
+=======
+  Stack()
+  {
+  }
+>>>>>>> 37edc407ffcaa6d528ef54d7432f2175a265a271
 };
 
 // represents the maze as 2d array of squares
@@ -62,6 +69,7 @@ byte winX = -1, winY = -1;
 
 void setup()
 {
+  Serial.begin(38400);
   serial.begin(19200);
   // sets back wall of first square to closed and marks it as visited
   squares[0][0].down = 1;
@@ -77,13 +85,12 @@ void loop()
 void explore()
 {
   // stack of squares we want to visit next
-  Stack toVisit;
+  Stack toVisit = Stack();
   // counter for checkWin
   byte counter = 0;
 
   while (true)
   {
-
     // update data abount current square
     setSquare();
 
@@ -115,22 +122,29 @@ void explore()
     // pushes locations to toVisit if we haven't visited them yet and they're open
     if (rightOpen && squares[nextLoc[0]][nextLoc[1]].visited == false)
     {
+      Serial.println("--IN--");
       toVisit.push(nextLoc);
     }
     nextLoc[0] = row;
     nextLoc[1] = col - 1;
+
+    Serial.println(nextLoc[0]);
     if (leftOpen && squares[nextLoc[0]][nextLoc[1]].visited == false)
     {
       toVisit.push(nextLoc);
     }
     nextLoc[0] = row + 1;
     nextLoc[1] = col;
+
+    Serial.println(nextLoc[0]);
     if (downOpen && squares[nextLoc[0]][nextLoc[1]].visited == false)
     {
       toVisit.push(nextLoc);
     }
     nextLoc[0] = row - 1;
     nextLoc[1] = col;
+
+    Serial.println(nextLoc[0]);
     if (upOpen && squares[nextLoc[0]][nextLoc[1]].visited == false)
     {
       toVisit.push(nextLoc);
@@ -138,6 +152,7 @@ void explore()
     // move to the first location on the stack
     Vector<int> next = toVisit.pop();
     moveTo(next[0], next[1]);
+    delay(10000);
   }
 }
 
@@ -262,69 +277,72 @@ void setSquare()
   if (dir == 0)
   {
     if (getSquares(0) > 0)
-      squares[row][col].left = 1;
-    else
       squares[row][col].left = 0;
+    else
+      squares[row][col].left = 1;
     if (getSquares(1) > 0)
-      squares[row][col].up = 1;
-    else
       squares[row][col].up = 0;
-    if (getSquares(2) > 0)
-      squares[row][col].right = 1;
     else
+      squares[row][col].up = 1;
+    if (getSquares(2) > 0)
       squares[row][col].right = 0;
+    else
+      squares[row][col].right = 1;
   }
   else if (dir == 1)
   {
     if (getSquares(0) > 0)
-      squares[row][col].up = 1;
-    else
       squares[row][col].up = 0;
+    else
+      squares[row][col].up = 1;
     if (getSquares(1) > 0)
-      squares[row][col].right = 1;
-    else
       squares[row][col].right = 0;
-    if (getSquares(2) > 0)
-      squares[row][col].down = 1;
     else
+      squares[row][col].right = 1;
+    if (getSquares(2) > 0)
       squares[row][col].down = 0;
+    else
+      squares[row][col].down = 1;
   }
   else if (dir == 2)
   {
     if (getSquares(0) > 0)
-      squares[row][col].right = 1;
-    else
       squares[row][col].right = 0;
+    else
+      squares[row][col].right = 1;
     if (getSquares(1) > 0)
-      squares[row][col].down = 1;
-    else
       squares[row][col].down = 0;
-    if (getSquares(2) > 0)
-      squares[row][col].left = 1;
     else
+      squares[row][col].down = 1;
+    if (getSquares(2) > 0)
       squares[row][col].left = 0;
+    else
+      squares[row][col].left = 1;
   }
   else
   {
     if (getSquares(0) > 0)
-      squares[row][col].down = 1;
-    else
       squares[row][col].down = 0;
+    else
+      squares[row][col].down = 1;
     if (getSquares(1) > 0)
-      squares[row][col].left = 1;
-    else
       squares[row][col].left = 0;
-    if (getSquares(2) > 0)
-      squares[row][col].up = 1;
     else
+      squares[row][col].left = 1;
+    if (getSquares(2) > 0)
       squares[row][col].up = 0;
+    else
+      squares[row][col].up = 1;
   }
   // updates adjacent squares
-  if(row > 0) squares[row-1][col].down = squares[row][col].up;
-  if(row < 9) squares[row+1][col].up = squares[row][col].down;
-  if(col > 0) squares[row][col-1].right = squares[row][col].left;
-  if(col < 9) squares[row][col+1].left = squares[row][col].right;
-
+  if (row > 0)
+    squares[row - 1][col].down = squares[row][col].up;
+  if (row < 9)
+    squares[row + 1][col].up = squares[row][col].down;
+  if (col > 0)
+    squares[row][col - 1].right = squares[row][col].left;
+  if (col < 9)
+    squares[row][col + 1].left = squares[row][col].right;
 }
 
 bool checkWin()
@@ -345,21 +363,50 @@ bool checkWin()
   return false;
 }
 
-// 0 is left, 1 is front, 2 is right
+/**
+ * 0 - left
+ * 1 - front
+ * 2 - right
+ **/
 byte getSquares(byte d)
 {
-  return floor(hc[d].dist() / 23.495);
+  return rnd(hc[d].dist() / 24.4475); // (23.495 + 25.4) / 2
 }
 
 void moveSquares(byte squares, bool b)
 {
   int numHoles = 0;
-  byte encValue = 0;
+  byte encValue = 0, ls = 127, rs = 252;
 
-  serial.write(b ? 1 : 127);   // left
-  serial.write(b ? 128 : 251); // right
-  while (numHoles <= (b ? 50 : 330 * squares))
+  serial.write(b ? 1 : ls);   // left
+  serial.write(b ? 128 : rs); // right
+  while (numHoles <= (b ? 50 : 300 * squares + squares * squares))
   {
+    if (squares % 300 == 150 && !b)
+    {
+      if (hc[2].dist() > hc[1].dist())
+        if (ls < 127)
+        {
+          ls++;
+          serial.write(ls);
+        }
+        else
+        {
+          rs -= 2;
+          serial.write(rs);
+        }
+      if (hc[1].dist() > hc[2].dist())
+        if (rs < 127)
+        {
+          rs++;
+          serial.write(rs);
+        }
+        else
+        {
+          ls -= 2;
+          serial.write(ls);
+        }
+    }
     if (e.read() != encValue)
     {
       encValue = e.read();
@@ -372,16 +419,20 @@ void moveSquares(byte squares, bool b)
   }
   serial.write(64);
   serial.write(192);
-  if (dir == 0) {
+  if (dir == 0)
+  {
     row -= squares;
   }
-  else if (dir == 2) {
+  else if (dir == 2)
+  {
     row += squares;
   }
-  else if (dir == 1) {
+  else if (dir == 1)
+  {
     col += squares;
   }
-  else {
+  else
+  {
     col -= squares;
   }
   delay(1000);

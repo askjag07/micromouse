@@ -44,14 +44,6 @@ struct Stack
   {
     return stack[stack.size() - 1];
   }
-
-<<<<<<< HEAD
-
-=======
-  Stack()
-  {
-  }
->>>>>>> 37edc407ffcaa6d528ef54d7432f2175a265a271
 };
 
 // represents the maze as 2d array of squares
@@ -116,7 +108,7 @@ void explore()
     bool downOpen = squares[row][col].down == 0;
     bool upOpen = squares[row][col].up == 0;
 
-    int temp[2] = {row, col+1};
+    int temp[2] = {row, col + 1};
     Vector<int> nextLoc(temp, 2);
 
     // pushes locations to toVisit if we haven't visited them yet and they're open

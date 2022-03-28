@@ -1,7 +1,7 @@
 #include <SoftwareSerial.h>
 #include <Encoder.h>
 #include <HCSR04.h>
-#include <Vector.h>
+#include <Array.h>
 
 SoftwareSerial serial(7, 8);
 Encoder e(18, 19);
@@ -21,7 +21,9 @@ struct Square
 struct Stack
 {
 
+  int storage_array[100];
   Vector<Vector<int>> stack;
+  stack.setStorage(storage_array)
 
   bool isEmpty()
   {
@@ -45,13 +47,9 @@ struct Stack
     return stack[stack.size() - 1];
   }
 
-<<<<<<< HEAD
-
-=======
   Stack()
   {
   }
->>>>>>> 37edc407ffcaa6d528ef54d7432f2175a265a271
 };
 
 // represents the maze as 2d array of squares

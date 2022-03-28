@@ -20,6 +20,7 @@ struct Square
 
 struct Stack
 {
+
   Vector<Vector<int>> stack;
 
   bool isEmpty()
@@ -42,6 +43,10 @@ struct Stack
   Vector<int> peek()
   {
     return stack[stack.size() - 1];
+  }
+
+  Stack()
+  {
   }
 };
 
@@ -76,7 +81,7 @@ void loop()
 void explore()
 {
   // stack of squares we want to visit next
-  Stack toVisit;
+  Stack toVisit = Stack();
   // counter for checkWin
   byte counter = 0;
 
@@ -110,26 +115,39 @@ void explore()
     Vector<int> nextLoc;
     nextLoc.push_back(row);
     nextLoc.push_back(col + 1);
+    nextLoc[0] = row;
+    nextLoc[1] = col + 1;
+
+    Serial.println(row);
+    Serial.println("Start: ");
+    Serial.println(nextLoc[0]);
 
     // pushes locations to toVisit if we haven't visited them yet and they're open
     if (rightOpen && squares[nextLoc[0]][nextLoc[1]].visited == false)
     {
+      Serial.println("--IN--");
       toVisit.push(nextLoc);
     }
     nextLoc[0] = row;
     nextLoc[1] = col - 1;
+
+    Serial.println(nextLoc[0]);
     if (leftOpen && squares[nextLoc[0]][nextLoc[1]].visited == false)
     {
       toVisit.push(nextLoc);
     }
     nextLoc[0] = row + 1;
     nextLoc[1] = col;
+
+    Serial.println(nextLoc[0]);
     if (downOpen && squares[nextLoc[0]][nextLoc[1]].visited == false)
     {
       toVisit.push(nextLoc);
     }
     nextLoc[0] = row - 1;
     nextLoc[1] = col;
+
+    Serial.println(nextLoc[0]);
     if (upOpen && squares[nextLoc[0]][nextLoc[1]].visited == false)
     {
       toVisit.push(nextLoc);
@@ -137,16 +155,13 @@ void explore()
     // move to the first location on the stack
     Vector<int> next = toVisit.pop();
     moveTo(next[0], next[1]);
+    delay(10000);
   }
 }
 
 // 0 is up, 1 is right, 2 is down, 3 is left
 void moveTo(int r, int c)
 {
-
-  Serial.print(r);
-  Serial.print(" - ");
-  Serial.println(c);
   // if the target square is adjacent to the current square
   if (((r == row - 1 || r == row + 1) && c == col) || ((c == col - 1 || c == col + 1) && r == row))
   {

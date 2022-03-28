@@ -21,26 +21,26 @@ struct Square
 struct Stack
 {
 
-  Array<Array<int,2>,100> stack;
+  Array<Array<int, 2>, 100> stack;
 
-      bool isEmpty()
+  bool isEmpty()
   {
     return stack.size() == 0;
   }
 
-  void push(Array<int,2> v)
+  void push(Array<int, 2> v)
   {
     stack.push_back(v);
   }
 
-  Array<int,2> pop()
+  Array<int, 2> pop()
   {
-    Array<int,2> val = stack[stack.size() - 1];
+    Array<int, 2> val = stack[stack.size() - 1];
     stack.pop_back();
     return val;
   }
 
-  Array<int,2> peek()
+  Array<int, 2> peek()
   {
     return stack[stack.size() - 1];
   }
@@ -65,7 +65,7 @@ byte winX = -1, winY = -1;
 
 void setup()
 {
-  Serial.begin(38400);
+  // Serial.begin(38400);
   serial.begin(19200);
   // sets back wall of first square to closed and marks it as visited
   squares[0][0].down = 1;
@@ -91,7 +91,7 @@ void explore()
     setSquare();
 
     // update trail, which is used for backtracking
-    Array<int,2> vect;
+    Array<int, 2> vect;
     vect.push_back(row);
     vect.push_back(col);
     trail.push(vect);
@@ -112,20 +112,18 @@ void explore()
     bool downOpen = squares[row][col].down == 0;
     bool upOpen = squares[row][col].up == 0;
 
-    Array<int,2> nextLoc;
+    Array<int, 2> nextLoc;
     nextLoc[0] = row;
-    nextLoc[1] = col+1;
+    nextLoc[1] = col + 1;
 
     // pushes locations to toVisit if we haven't visited them yet and they're open
     if (rightOpen && squares[nextLoc[0]][nextLoc[1]].visited == false)
     {
-      Serial.println("--IN--");
       toVisit.push(nextLoc);
     }
     nextLoc[0] = row;
     nextLoc[1] = col - 1;
 
-    Serial.println(nextLoc[0]);
     if (leftOpen && squares[nextLoc[0]][nextLoc[1]].visited == false)
     {
       toVisit.push(nextLoc);
@@ -133,7 +131,6 @@ void explore()
     nextLoc[0] = row + 1;
     nextLoc[1] = col;
 
-    Serial.println(nextLoc[0]);
     if (downOpen && squares[nextLoc[0]][nextLoc[1]].visited == false)
     {
       toVisit.push(nextLoc);
@@ -141,15 +138,13 @@ void explore()
     nextLoc[0] = row - 1;
     nextLoc[1] = col;
 
-    Serial.println(nextLoc[0]);
     if (upOpen && squares[nextLoc[0]][nextLoc[1]].visited == false)
     {
       toVisit.push(nextLoc);
     }
     // move to the first location on the stack
-    Array<int,2> next = toVisit.pop();
+    Array<int, 2> next = toVisit.pop();
     moveTo(next[0], next[1]);
-    delay(10000);
   }
 }
 
@@ -255,7 +250,7 @@ void moveTo(int r, int c)
   // if the target square is not adjacent to the current square, backtrack along trail
   else
   {
-    Array<int,2> curr = trail.pop();
+    Array<int, 2> curr = trail.pop();
     while (!((curr[0] == r - 1 || curr[0] == r + 1) && curr[1] == c) || ((curr[1] == c - 1 || curr[1] == c + 1) && curr[0] == r))
     {
       moveTo(curr[0], curr[1]);
@@ -432,7 +427,6 @@ void moveSquares(byte squares, bool b)
   {
     col -= squares;
   }
-  delay(1000);
 }
 
 // 0 is up, 1 is right, 2 is down, 3 is left
@@ -455,7 +449,7 @@ void turn(bool left)
     serial.write(1);
     serial.write(255);
   }
-  while (numHoles <= 150)
+  while (numHoles <= 400)
   {
     if (e.read() != encValue)
     {
@@ -469,7 +463,6 @@ void turn(bool left)
   }
   serial.write(64);
   serial.write(192);
-  delay(1000);
   moveSquares(1, true);
 }
 

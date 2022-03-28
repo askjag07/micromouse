@@ -339,9 +339,9 @@ void setSquare()
 
 bool checkWin()
 {
-  for (byte r = 0; r < 9; r++)
+  for (int r = 0; r < 9; r++)
   {
-    for (byte c = 0; c < 9; c++)
+    for (int c = 0; c < 9; c++)
     {
       if (squares[r][c].right == 0 && squares[r][c].down == 0 && squares[r + 1][c].up == 0 && squares[r + 1][c].right == 0 &&
           squares[r][c + 1].left == 0 && squares[r][c + 1].down == 0 && squares[r + 1][c + 1].up == 0 && squares[r + 1][c + 1].left == 0)
@@ -372,7 +372,7 @@ void moveSquares(byte squares, bool b)
 
   serial.write(b ? 1 : ls);   // left
   serial.write(b ? 128 : rs); // right
-  while (numHoles <= (b ? 50 : 300 * squares + squares * squares))
+  while (numHoles <= (b ? 50 : 215))
   {
     if (squares % 300 == 150 && !b)
     {
@@ -427,6 +427,7 @@ void moveSquares(byte squares, bool b)
   {
     col -= squares;
   }
+  delay(750);
 }
 
 // 0 is up, 1 is right, 2 is down, 3 is left
@@ -439,17 +440,17 @@ void turn(bool left)
   {
     if (--dir < 0)
       dir = 3;
-    serial.write(127);
-    serial.write(128);
+    serial.write(1);
+    serial.write(255);
   }
   else
   {
     if (++dir > 3)
       dir = 0;
-    serial.write(1);
-    serial.write(255);
+    serial.write(127);
+    serial.write(128);
   }
-  while (numHoles <= 400)
+  while (numHoles <= 124)
   {
     if (e.read() != encValue)
     {
@@ -464,6 +465,7 @@ void turn(bool left)
   serial.write(64);
   serial.write(192);
   moveSquares(1, true);
+  delay(750);
 }
 
 int rnd(float n)

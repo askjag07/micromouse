@@ -23,7 +23,7 @@ struct Stack
 
   Array<Array<int,2>,100> stack;
 
-  bool isEmpty()
+      bool isEmpty()
   {
     return stack.size() == 0;
   }

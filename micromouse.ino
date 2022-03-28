@@ -146,6 +146,8 @@ void explore()
     Array<int, 2> next = toVisit.pop();
     moveTo(next[0], next[1]);
   }
+  // move back to the beginning after exploring
+  moveTo(0,0);
 }
 
 // 0 is up, 1 is right, 2 is down, 3 is left

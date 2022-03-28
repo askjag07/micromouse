@@ -83,7 +83,7 @@ void explore()
   // stack of squares we want to visit next
   Stack toVisit = Stack();
   // counter for checkWin
-  byte counter = 0;
+  int counter = 0;
 
   while (true)
   {

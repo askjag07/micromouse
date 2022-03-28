@@ -1,7 +1,7 @@
 #include <SoftwareSerial.h>
 #include <Encoder.h>
 #include <HCSR04.h>
-#include <Vector.h>
+#include <Array.h>
 
 SoftwareSerial serial(7, 8);
 Encoder e(18, 19);
@@ -21,9 +21,11 @@ struct Square
 struct Stack
 {
 
+  int storage_array[100];
   Vector<Vector<int>> stack;
+  stack.setStorage(storage_array)
 
-  bool isEmpty()
+      bool isEmpty()
   {
     return stack.size() == 0;
   }
@@ -43,6 +45,10 @@ struct Stack
   Vector<int> peek()
   {
     return stack[stack.size() - 1];
+  }
+
+  Stack()
+  {
   }
 };
 

@@ -96,15 +96,10 @@ void explore()
     vect.push_back(col);
     trail.push(vect);
 
-    // check for the middle every 6 moves. if we found the middle, break out of the loop
-    counter++;
-    counter %= 6;
-    if (counter == 5)
+    // check for the middle. if we found the middle, break out of the loop
+    if (checkWin)
     {
-      if (checkWin)
-      {
-        break;
-      }
+      break;
     }
 
     bool rightOpen = squares[row][col].right == 0;

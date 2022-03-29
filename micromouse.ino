@@ -122,7 +122,7 @@ void explore()
     trail.push(vect);
 
     // check for the middle. if we found the middle, break out of the loop
-    if (checkWin)
+    if (checkWin())
     {
       break;
     }

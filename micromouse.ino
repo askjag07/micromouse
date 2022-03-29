@@ -44,9 +44,33 @@ struct Stack
   {
     return stack[stack.size() - 1];
   }
+};
 
-  Stack()
+struct Queue
+{
+
+  Array<Array<int, 2>, 100> queue;
+
+  bool isEmpty()
   {
+    return queue.size() == 0;
+  }
+
+  void enqueue(Array<int, 2> v)
+  {
+    queue.push_back(v);
+  }
+
+  Array<int, 2> dequeue()
+  {
+    Array<int, 2> val = queue[0];
+    queue.remove(0);
+    return val;
+  }
+
+  Array<int, 2> peek()
+  {
+    return queue[0];
   }
 };
 
@@ -61,7 +85,7 @@ int row = 0, col = 0;
 byte dir = 1;
 
 // coords of middle/winning square (updated in checkWin)
-byte winX = -1, winY = -1;
+int winX = -1, winY = -1;
 
 void setup()
 {
@@ -81,7 +105,7 @@ void loop()
 void explore()
 {
   // stack of squares we want to visit next
-  Stack toVisit = Stack();
+  Stack toVisit;
   // counter for checkWin
   int counter = 0;
 
@@ -145,9 +169,82 @@ void explore()
   moveTo(0,0);
 }
 
+void solve() {
+  int currRow = row; 
+  int currCol = col;
+  // [row of where it came from, col of where it came from, visited (0 unvisited, 1 visited)]
+  Array<Array<Array<int,3>,10>,10> locs;
+  Queue toVisit;
+  Array<int, 3> start;
+  start[0] = 0; start[1] = 0; start[2] = 0;
+  toVisit.enqueue(start);
+
+  while(!toVisit.isEmpty()) {
+    Array<int, 3> nextLoc = toVisit.dequeue();
+    currRow = nextLoc[0]; currCol = nextLoc[1];
+    nextLoc[2] = 1;
+    if(currRow == winX && currCol == winY) {
+      break;
+    }
+    if(squares[currRow][currCol].up == 0 && locs[currRow-1][currCol][2] == 0) {
+      // enqueue the next location into toVisit
+      Array<int, 2> temp;
+      temp[0] = currRow-1; temp[1] = currCol;
+      toVisit.enqueue(temp);
+      // updates locs
+      Array<int, 3> temp1;
+      temp1[0] = currRow; temp1[1] = currCol; temp1[2] = 0;
+      locs[currRow-1][currCol] = temp1;
+    }
+    if(squares[currRow][currCol].right == 0 && locs[currRow][currCol+1][2] == 0) {
+      Array<int, 2> temp;
+      temp[0] = currRow; temp[1] = currCol+1;
+      toVisit.enqueue(temp);
+
+      Array<int, 3> temp1;
+      temp1[0] = currRow; temp1[1] = currCol; temp1[2] = 0;
+      locs[currRow][currCol+1] = temp1;
+    }
+    if(squares[currRow][currCol].down == 0 && locs[currRow+1][currCol][2] == 0) {
+      Array<int, 2> temp;
+      temp[0] = currRow+1; temp[1] = currCol;
+      toVisit.enqueue(temp);
+
+      Array<int, 3> temp1;
+      temp1[0] = currRow; temp1[1] = currCol; temp1[2] = 0;
+      locs[currRow+1][currCol] = temp1;
+    }
+    if(squares[currRow][currCol].left == 0 && locs[currRow][currCol-1][2] == 0) {
+      Array<int, 2> temp;
+      temp[0] = currRow; temp[1] = currCol-1;
+      toVisit.enqueue(temp);
+
+      Array<int, 3> temp1;
+      temp1[0] = currRow; temp1[1] = currCol; temp1[2] = 0;
+      locs[currRow][currCol-1] = temp1;
+    }
+  }
+  Stack shortestPath;
+  Array<int, 3> nextSquare = locs[winX][winY];
+  while(nextSquare[0] != row && nextSquare[1] != col) {
+    Array<int, 2> loc1; loc1[0] = nextSquare[0]; loc1[1] = nextSquare[1];
+    shortestPath.push(loc1);
+    nextSquare = locs[nextSquare[0]][nextSquare[1]];
+  }
+  
+  // moves robot to middle through shortest path
+  while(row != winX && col != winY && !shortestPath.isEmpty()) {
+    Array<int, 2> pathSquare = shortestPath.pop();
+    moveTo(pathSquare[0], pathSquare[1]);
+  }
+}
+
 // 0 is up, 1 is right, 2 is down, 3 is left
 void moveTo(int r, int c)
 {
+  if(r == row && c == col) {
+    return;
+  }
   // if the target square is adjacent to the current square
   if (((r == row - 1 || r == row + 1) && c == col) || ((c == col - 1 || c == col + 1) && r == row))
   {

@@ -1,0 +1,69 @@
+public static void solveQueueShortest(GridDisplay grid)
+    {
+        LLQueue<Location> queue = new LLQueue<Location>();
+
+        queue.enqueue(new Location(1, 1));
+
+        Location[][] locs = new Location[grid.getNumRows()][grid.getNumCols()];
+
+        int n = 0;
+        while(!queue.isEmpty())
+        {
+            grid.pause(100);
+            Location toVisit = queue.dequeue();
+            if(toVisit.equals(new Location(grid.getNumRows() - 2, grid.getNumCols() - 2)))
+                break;
+            else if(grid.getColor(toVisit).equals(PATH_COLOR))
+            {
+                grid.setColor(toVisit, BLUE_COLOR);
+
+                if(grid.getColor(new Location(toVisit.getRow() - 1, toVisit.getCol())).equals(PATH_COLOR))
+                {
+                    queue.enqueue(new Location(toVisit.getRow() - 1, toVisit.getCol()));
+                    locs[toVisit.getRow() - 1][toVisit.getCol()] = toVisit;
+                }
+
+                if(grid.getColor(new Location(toVisit.getRow(), toVisit.getCol() + 1)).equals(PATH_COLOR))
+                {
+                    queue.enqueue(new Location(toVisit.getRow(), toVisit.getCol() + 1));
+                    locs[toVisit.getRow()][toVisit.getCol() + 1] = toVisit;
+                }
+
+                if(grid.getColor(new Location(toVisit.getRow(), toVisit.getCol() - 1)).equals(PATH_COLOR))
+                {
+                    queue.enqueue(new Location(toVisit.getRow(), toVisit.getCol() - 1));
+                    locs[toVisit.getRow()][toVisit.getCol() - 1] = toVisit;
+                }
+
+                if(grid.getColor(new Location(toVisit.getRow() + 1, toVisit.getCol())).equals(PATH_COLOR))
+                {
+                    queue.enqueue(new Location(toVisit.getRow() + 1, toVisit.getCol()));
+                    locs[toVisit.getRow() + 1][toVisit.getCol()] = toVisit;
+                }
+            }
+            n++;
+            System.out.println(n);
+        }
+        
+
+        clearBlue(grid);
+
+        boolean x = true;
+        Location toVisit = new Location(grid.getNumRows() - 2, grid.getNumCols() - 2);
+
+        while(x)
+        {
+            if(!toVisit.equals(new Location(1, 1)))
+            {
+                grid.setColor(toVisit, VISIT_COLOR);
+                toVisit = locs[toVisit.getRow()][toVisit.getCol()];
+            }
+            else
+            {
+                grid.setColor(toVisit, VISIT_COLOR);
+                x = false;
+            }
+            n++;
+            System.out.println(n);
+        }
+    }

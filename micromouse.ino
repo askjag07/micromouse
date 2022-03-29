@@ -95,6 +95,7 @@ void setup()
   squares[0][0].down = 1;
   squares[0][0].visited = true;
   explore();
+  solve();
 }
 
 void loop()

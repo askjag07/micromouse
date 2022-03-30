@@ -274,15 +274,43 @@ void moveTo(int r, int c)
   // if the target square is adjacent to the current square
   if (((r == row - 1 || r == row + 1) && c == col) || ((c == col - 1 || c == col + 1) && r == row))
   {
-    if (r == row - 1)
-      turnLeft(dir);
-    if (r == row + 1)
-      turnLeft((dir + 2) % 4);
-    if (c == col + 1)
-      turnLeft((dir + 3) % 4);
-    if (c == col - 1)
-      turnLeft((dir + 1) % 4);
-    moveOne();
+
+    if (r == row - 1) {
+      if(dir == 2) {
+        moveBackOne();
+      }
+      else {
+        turnLeft(dir);
+        moveOne();
+      }
+    }
+    if (r == row + 1) {
+      if(dir == 0) {
+        moveBackOne();
+      }
+      else {
+        turnLeft((dir+2)%4);
+        moveOne();
+      }
+    }
+    if (c == col + 1) {
+      if(dir == 3) {
+        moveBackOne();
+      }
+      else {
+        turnLeft((dir+3)%4);
+        moveOne();
+      }
+    }
+    if (c == col - 1) {
+      if(dir == 1) {
+        moveBackOne();
+      }
+      else {
+        turnLeft((dir+1)%4);
+        moveOne();
+      }
+    }
   }
   // if the target square is not adjacent to the current square, backtrack along trail
   else

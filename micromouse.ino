@@ -89,17 +89,28 @@ int winX = -1, winY = -1;
 
 void setup()
 {
-  // Serial.begin(38400);
+  Serial.begin(38400);
   serial.begin(19200);
   // sets back wall of first square to closed and marks it as visited
   squares[0][0].down = 1;
   squares[0][0].visited = true;
-  explore();
-  solve();
+
+  // Implement calibrate.
+  // explore();
+  // solve();
 }
+
+int i = 0;
 
 void loop()
 {
+  turnLeft(i);
+  i++;
+  delay(2000);
+  /*Serial.print(hc[0].dist());
+  Serial.print(" - ");
+  Serial.println(hc[2].dist());
+  delay(1000);*/
 }
 
 // explores the maze, gathering data and finding the winning square
@@ -122,10 +133,8 @@ void explore()
     trail.push(vect);
 
     // check for the middle. if we found the middle, break out of the loop
-    if (checkWin)
-    {
+    if (checkWin())
       break;
-    }
 
     bool rightOpen = squares[row][col].right == 0;
     bool leftOpen = squares[row][col].left == 0;
@@ -167,74 +176,100 @@ void explore()
     moveTo(next[0], next[1]);
   }
   // move back to the beginning after exploring
-  moveTo(0,0);
+  moveTo(0, 0);
 }
 
-void solve() {
-  int currRow = row; 
+void solve()
+{
+  int currRow = row;
   int currCol = col;
   // [row of where it came from, col of where it came from, visited (0 unvisited, 1 visited)]
-  Array<Array<Array<int,3>,10>,10> locs;
+  Array<Array<Array<int, 3>, 10>, 10> locs;
   Queue toVisit;
   Array<int, 3> start;
-  start[0] = 0; start[1] = 0; start[2] = 0;
+  start[0] = 0;
+  start[1] = 0;
+  start[2] = 0;
   toVisit.enqueue(start);
 
-  while(!toVisit.isEmpty()) {
+  while (!toVisit.isEmpty())
+  {
     Array<int, 3> nextLoc = toVisit.dequeue();
-    currRow = nextLoc[0]; currCol = nextLoc[1];
+    currRow = nextLoc[0];
+    currCol = nextLoc[1];
     nextLoc[2] = 1;
-    if(currRow == winX && currCol == winY) {
+    if (currRow == winX && currCol == winY)
+    {
       break;
     }
-    if(squares[currRow][currCol].up == 0 && locs[currRow-1][currCol][2] == 0) {
+    if (squares[currRow][currCol].up == 0 && locs[currRow - 1][currCol][2] == 0)
+    {
       // enqueue the next location into toVisit
       Array<int, 2> temp;
-      temp[0] = currRow-1; temp[1] = currCol;
+      temp[0] = currRow - 1;
+      temp[1] = currCol;
       toVisit.enqueue(temp);
       // updates locs
       Array<int, 3> temp1;
-      temp1[0] = currRow; temp1[1] = currCol; temp1[2] = 0;
-      locs[currRow-1][currCol] = temp1;
+      temp1[0] = currRow;
+      temp1[1] = currCol;
+      temp1[2] = 0;
+      locs[currRow - 1][currCol] = temp1;
     }
-    if(squares[currRow][currCol].right == 0 && locs[currRow][currCol+1][2] == 0) {
+    if (squares[currRow][currCol].right == 0 && locs[currRow][currCol + 1][2] == 0)
+    {
       Array<int, 2> temp;
-      temp[0] = currRow; temp[1] = currCol+1;
+      temp[0] = currRow;
+      temp[1] = currCol + 1;
       toVisit.enqueue(temp);
 
       Array<int, 3> temp1;
-      temp1[0] = currRow; temp1[1] = currCol; temp1[2] = 0;
-      locs[currRow][currCol+1] = temp1;
+      temp1[0] = currRow;
+      temp1[1] = currCol;
+      temp1[2] = 0;
+      locs[currRow][currCol + 1] = temp1;
     }
-    if(squares[currRow][currCol].down == 0 && locs[currRow+1][currCol][2] == 0) {
+    if (squares[currRow][currCol].down == 0 && locs[currRow + 1][currCol][2] == 0)
+    {
       Array<int, 2> temp;
-      temp[0] = currRow+1; temp[1] = currCol;
+      temp[0] = currRow + 1;
+      temp[1] = currCol;
       toVisit.enqueue(temp);
 
       Array<int, 3> temp1;
-      temp1[0] = currRow; temp1[1] = currCol; temp1[2] = 0;
-      locs[currRow+1][currCol] = temp1;
+      temp1[0] = currRow;
+      temp1[1] = currCol;
+      temp1[2] = 0;
+      locs[currRow + 1][currCol] = temp1;
     }
-    if(squares[currRow][currCol].left == 0 && locs[currRow][currCol-1][2] == 0) {
+    if (squares[currRow][currCol].left == 0 && locs[currRow][currCol - 1][2] == 0)
+    {
       Array<int, 2> temp;
-      temp[0] = currRow; temp[1] = currCol-1;
+      temp[0] = currRow;
+      temp[1] = currCol - 1;
       toVisit.enqueue(temp);
 
       Array<int, 3> temp1;
-      temp1[0] = currRow; temp1[1] = currCol; temp1[2] = 0;
-      locs[currRow][currCol-1] = temp1;
+      temp1[0] = currRow;
+      temp1[1] = currCol;
+      temp1[2] = 0;
+      locs[currRow][currCol - 1] = temp1;
     }
   }
   Stack shortestPath;
   Array<int, 3> nextSquare = locs[winX][winY];
-  while(nextSquare[0] != row && nextSquare[1] != col) {
-    Array<int, 2> loc1; loc1[0] = nextSquare[0]; loc1[1] = nextSquare[1];
+  while (nextSquare[0] != row && nextSquare[1] != col)
+  {
+    Array<int, 2> loc1;
+    loc1[0] = nextSquare[0];
+    loc1[1] = nextSquare[1];
     shortestPath.push(loc1);
     nextSquare = locs[nextSquare[0]][nextSquare[1]];
   }
-  
+
   // moves robot to middle through shortest path
-  while(row != winX && col != winY && !shortestPath.isEmpty()) {
+  while (row != winX && col != winY && !shortestPath.isEmpty())
+  {
     Array<int, 2> pathSquare = shortestPath.pop();
     moveTo(pathSquare[0], pathSquare[1]);
   }
@@ -243,104 +278,20 @@ void solve() {
 // 0 is up, 1 is right, 2 is down, 3 is left
 void moveTo(int r, int c)
 {
-  if(r == row && c == col) {
+  if (r == row && c == col)
     return;
-  }
   // if the target square is adjacent to the current square
   if (((r == row - 1 || r == row + 1) && c == col) || ((c == col - 1 || c == col + 1) && r == row))
   {
     if (r == row - 1)
-    {
-      if (dir == 0)
-      {
-        moveSquares(1, false);
-      }
-      else if (dir == 1)
-      {
-        turn(true);
-        moveSquares(1, false);
-      }
-      else if (dir == 2)
-      {
-        turn(true);
-        turn(true);
-        moveSquares(1, false);
-      }
-      else
-      {
-        turn(false);
-        moveSquares(1, false);
-      }
-    }
+      turnLeft(dir);
     if (r == row + 1)
-    {
-      if (dir == 0)
-      {
-        turn(true);
-        turn(true);
-        moveSquares(1, false);
-      }
-      else if (dir == 1)
-      {
-        turn(false);
-        moveSquares(1, false);
-      }
-      else if (dir == 2)
-      {
-        moveSquares(1, false);
-      }
-      else
-      {
-        turn(true);
-        moveSquares(1, false);
-      }
-    }
+      turnLeft((dir + 2) % 4);
     if (c == col + 1)
-    {
-      if (dir == 0)
-      {
-        turn(false);
-        moveSquares(1, false);
-      }
-      else if (dir == 1)
-      {
-        moveSquares(1, false);
-      }
-      else if (dir == 2)
-      {
-        turn(true);
-        moveSquares(1, false);
-      }
-      else
-      {
-        turn(true);
-        turn(true);
-        moveSquares(1, false);
-      }
-    }
+      turnLeft((dir + 3) % 4);
     if (c == col - 1)
-    {
-      if (dir == 0)
-      {
-        turn(true);
-        moveSquares(1, false);
-      }
-      else if (dir == 1)
-      {
-        turn(false);
-        turn(false);
-        moveSquares(1, false);
-      }
-      else if (dir == 2)
-      {
-        turn(false);
-        moveSquares(1, false);
-      }
-      else
-      {
-        moveSquares(1, false);
-      }
-    }
+      turnLeft((dir + 1) % 4);
+    moveOne();
   }
   // if the target square is not adjacent to the current square, backtrack along trail
   else
@@ -435,9 +386,7 @@ void setSquare()
 bool checkWin()
 {
   for (int r = 0; r < 9; r++)
-  {
     for (int c = 0; c < 9; c++)
-    {
       if (squares[r][c].right == 0 && squares[r][c].down == 0 && squares[r + 1][c].up == 0 && squares[r + 1][c].right == 0 &&
           squares[r][c + 1].left == 0 && squares[r][c + 1].down == 0 && squares[r + 1][c + 1].up == 0 && squares[r + 1][c + 1].left == 0)
       {
@@ -445,8 +394,6 @@ bool checkWin()
         winY = c;
         return true;
       }
-    }
-  }
   return false;
 }
 
@@ -457,110 +404,89 @@ bool checkWin()
  **/
 byte getSquares(byte d)
 {
-  return rnd(hc[d].dist() / 24.4475); // (23.495 + 25.4) / 2
+  return rnd(hc[d].dist() / 25.4); // (23.495 + 25.4) / 2 = 24.4475
 }
 
-void moveSquares(byte squares, bool b)
+// pre: front is clear
+// post: robot moves one square forward
+void moveOne()
 {
-  int numHoles = 0;
-  byte encValue = 0, ls = 100, rs = 225;
+  byte ls = 89, rs = 216;
+  int s0 = rnd(hc[0].dist()), s2 = rnd(hc[2].dist());
 
-  serial.write(b ? 1 : ls);   // left
-  serial.write(b ? 128 : rs); // right
-  while (numHoles <= (b ? 100 : 310))
+  if (s2 < 3 || (s0 > 6 && s0 < 10))
+    rs += 1;
+  if (s0 < 4 || (s2 > 5 && s2 < 10))
+    ls += 2;
+
+  roboclaw(ls, rs, 295, 750);
+
+  switch (dir)
   {
-    if (squares % 300 == 150 && !b)
-    {
-      if (hc[2].dist() > hc[1].dist())
-        if (ls < 127)
-        {
-          ls++;
-          serial.write(ls);
-        }
-        else
-        {
-          rs -= 2;
-          serial.write(rs);
-        }
-      if (hc[1].dist() > hc[2].dist())
-        if (rs < 127)
-        {
-          rs++;
-          serial.write(rs);
-        }
-        else
-        {
-          ls -= 2;
-          serial.write(ls);
-        }
-    }
-    if (e.read() != encValue)
-    {
-      encValue = e.read();
-      if (encValue == 0)
-      {
-        numHoles++;
-        encValue = 0;
-      }
-    }
+  case 0:
+    row--;
+    break;
+  case 2:
+    row++;
+    break;
+  case 1:
+    col++;
+    break;
+  default:
+    col--;
+    break;
   }
-  serial.write(64);
-  serial.write(192);
-  if (dir == 0)
-  {
-    row -= squares;
-  }
-  else if (dir == 2)
-  {
-    row += squares;
-  }
-  else if (dir == 1)
-  {
-    col += squares;
-  }
-  else
-  {
-    col -= squares;
-  }
-  delay(750);
 }
 
-// 0 is up, 1 is right, 2 is down, 3 is left
-void turn(bool left)
+void move(byte squares)
+{
+  for (byte i = 0; i < squares; i++)
+    moveOne();
+}
+
+void turnLeft(byte turns)
 {
   int numHoles = 0;
   byte encValue = 0;
 
-  if (left)
-  {
-    if (--dir < 0)
-      dir = 3;
-    serial.write(1);
-    serial.write(255);
-  }
+  dir += turns * 3;
+  dir %= 4;
+
+  if (turns % 4 == 3)
+    for (byte i = 0; i < 2; i++)
+    {
+      roboclaw(88, 168, 125, 750);
+      roboclaw(41, 168, 20, 750);
+    }
   else
-  {
-    if (++dir > 3)
-      dir = 0;
-    serial.write(127);
-    serial.write(128);
-  }
-  while (numHoles <= 128)
-  {
+    for (byte i = 0; i < (turns % 4) * 2; i++)
+    {
+      roboclaw(40, 216, 125, 750);
+      roboclaw(41, 168, 20, 750);
+    }
+}
+
+void roboclaw(byte left, byte right, int numHoles, int delay)
+{
+  int n = 0;
+  byte encValue = 0;
+
+  serial.write(left);
+  serial.write(right);
+
+  while (n <= numHoles)
     if (e.read() != encValue)
     {
       encValue = e.read();
       if (encValue == 0)
       {
-        numHoles++;
+        n++;
         encValue = 0;
       }
     }
-  }
-  serial.write(64);
-  serial.write(192);
-  moveSquares(1, true);
-  delay(750);
+
+  serial.write(64);  // left
+  serial.write(192); // right
 }
 
 int rnd(float n)

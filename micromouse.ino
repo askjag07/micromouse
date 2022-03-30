@@ -96,21 +96,12 @@ void setup()
   squares[0][0].visited = true;
 
   // Implement calibrate.
-  // explore();
-  // solve();
+  explore();
+  solve();
 }
-
-int i = 0;
 
 void loop()
 {
-  turnLeft(i);
-  i++;
-  delay(2000);
-  /*Serial.print(hc[0].dist());
-  Serial.print(" - ");
-  Serial.println(hc[2].dist());
-  delay(1000);*/
 }
 
 // explores the maze, gathering data and finding the winning square
@@ -446,27 +437,24 @@ void move(byte squares)
 
 void turnLeft(byte turns)
 {
-  int numHoles = 0;
-  byte encValue = 0;
-
-  dir += turns * 3;
-  dir %= 4;
-
+  if (turns % 2 != 0)
+  {
+    dir += turns * 3;
+    dir %= 4;
+  }
   if (turns % 4 == 3)
-    for (byte i = 0; i < 2; i++)
-    {
-      roboclaw(88, 168, 125, 750);
-      roboclaw(41, 168, 20, 750);
-    }
-  else
-    for (byte i = 0; i < (turns % 4) * 2; i++)
-    {
-      roboclaw(40, 216, 125, 750);
-      roboclaw(41, 168, 20, 750);
-    }
+  {
+    roboclaw(88, 168, 180, 750);
+    roboclaw(41, 168, 60, 750);
+  }
+  if (turns % 4 == 1)
+  {
+    roboclaw(40, 216, 180, 750);
+    roboclaw(41, 168, 60, 750);
+  }
 }
 
-void roboclaw(byte left, byte right, int numHoles, int delay)
+void roboclaw(byte left, byte right, int numHoles, int dlay)
 {
   int n = 0;
   byte encValue = 0;
@@ -487,6 +475,8 @@ void roboclaw(byte left, byte right, int numHoles, int delay)
 
   serial.write(64);  // left
   serial.write(192); // right
+
+  delay(dlay);
 }
 
 int rnd(float n)

@@ -89,10 +89,10 @@ int winX = -1, winY = -1;
 
 void setup()
 {
-  Serial.begin(38400);
+  // Serial.begin(38400);
   serial.begin(19200);
   // sets back wall of first square to closed and marks it as visited
-  squares[0][0].down = 1;
+  squares[0][0].left = 1;
   squares[0][0].visited = true;
 
   // Implement calibrate.
@@ -420,6 +420,7 @@ bool checkWin()
  **/
 byte getSquares(byte d)
 {
+  hc[d].dist();
   return rnd(hc[d].dist() / 25.4); // (23.495 + 25.4) / 2 = 24.4475
 }
 
@@ -435,7 +436,7 @@ void moveOne()
   if (s0 < 4 || (s2 > 5 && s2 < 10))
     ls += 2;
 
-  roboclaw(ls, rs, 295, 750);
+  roboclaw(ls, rs, 330, 750);
 
   switch (dir)
   {
@@ -462,9 +463,9 @@ void moveBackOne()
   int s0 = rnd(hc[0].dist()), s2 = rnd(hc[2].dist());
 
   if (s2 < 3 || (s0 > 6 && s0 < 10))
-    ls -= 2;
-  if (s0 < 4 || (s2 > 5 && s2 < 10))
     rs -= 1;
+  if (s0 < 4 || (s2 > 5 && s2 < 10))
+    ls -= 2;
 
   roboclaw(ls, rs, 295, 750);
 
@@ -500,12 +501,12 @@ void turnLeft(byte turns)
   }
   if (turns % 4 == 3)
   {
-    roboclaw(88, 168, 180, 750);
+    roboclaw(88, 168, 165, 750);
     roboclaw(41, 168, 60, 750);
   }
   if (turns % 4 == 1)
   {
-    roboclaw(40, 216, 180, 750);
+    roboclaw(40, 216, 165, 750);
     roboclaw(41, 168, 60, 750);
   }
 }

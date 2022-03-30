@@ -275,43 +275,40 @@ void moveTo(int r, int c)
   if (((r == row - 1 || r == row + 1) && c == col) || ((c == col - 1 || c == col + 1) && r == row))
   {
 
-    if (r == row - 1) {
-      if(dir == 2) {
+    if (r == row - 1)
+      if (dir == 2)
         moveBackOne();
-      }
-      else {
+      else
+      {
         turnLeft(dir);
         moveOne();
       }
-    }
-    if (r == row + 1) {
-      if(dir == 0) {
+    if (r == row + 1)
+      if (dir == 0)
         moveBackOne();
-      }
-      else {
-        turnLeft((dir+2)%4);
+      else
+      {
+        turnLeft((dir + 2) % 4);
         moveOne();
       }
-    }
-    if (c == col + 1) {
-      if(dir == 3) {
+    if (c == col + 1)
+      if (dir == 3)
         moveBackOne();
-      }
-      else {
-        turnLeft((dir+3)%4);
+      else
+      {
+        turnLeft((dir + 3) % 4);
         moveOne();
       }
-    }
-    if (c == col - 1) {
-      if(dir == 1) {
+    if (c == col - 1)
+      if (dir == 1)
         moveBackOne();
-      }
-      else {
-        turnLeft((dir+1)%4);
+      else
+      {
+        turnLeft((dir + 1) % 4);
         moveOne();
       }
-    }
   }
+
   // if the target square is not adjacent to the current square, backtrack along trail
   else
   {
@@ -453,6 +450,37 @@ void moveOne()
     break;
   default:
     col--;
+    break;
+  }
+}
+
+// pre: back is clear
+// post: robot moves one square backward
+void moveBackOne()
+{
+  byte ls = 39, rs = 168;
+  int s0 = rnd(hc[0].dist()), s2 = rnd(hc[2].dist());
+
+  if (s2 < 3 || (s0 > 6 && s0 < 10))
+    ls -= 2;
+  if (s0 < 4 || (s2 > 5 && s2 < 10))
+    rs -= 1;
+
+  roboclaw(ls, rs, 295, 750);
+
+  switch (dir)
+  {
+  case 0:
+    row++;
+    break;
+  case 2:
+    row--;
+    break;
+  case 1:
+    col--;
+    break;
+  default:
+    col++;
     break;
   }
 }

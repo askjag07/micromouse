@@ -428,7 +428,6 @@ byte getSquares(byte d)
  *
  *
  **/
-byte lastMove = 0;
 
 // pre: front is clear
 // post: robot moves one square forward

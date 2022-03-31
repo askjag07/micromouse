@@ -424,19 +424,29 @@ byte getSquares(byte d)
   return rnd(hc[d].dist() / 25.4); // (23.495 + 25.4) / 2 = 24.4475
 }
 
+/**
+ *
+ *
+ **/
+byte lastMove = 0;
+
 // pre: front is clear
 // post: robot moves one square forward
 void moveOne()
 {
-  byte ls = 89, rs = 216;
+  byte ls = 90, rs = 216;
   int s0 = rnd(hc[0].dist()), s2 = rnd(hc[2].dist());
 
-  if (s2 < 3 || (s0 > 6 && s0 < 10))
-    rs += 1;
-  if (s0 < 4 || (s2 > 5 && s2 < 10))
+  if (s2 < 2)
+    rs += 3;
+  else if (s2 < 4 || (s0 > 4 && s0 < 10))
+    rs += 2;
+  if (s0 < 2)
     ls += 2;
+  else if (s0 < 4 || (s2 > 4 && s2 < 10))
+    ls++;
 
-  roboclaw(ls, rs, 330, 750);
+  roboclaw(ls, rs, 340, 750);
 
   switch (dir)
   {
@@ -467,7 +477,7 @@ void moveBackOne()
   if (s0 < 4 || (s2 > 5 && s2 < 10))
     ls -= 2;
 
-  roboclaw(ls, rs, 295, 750);
+  roboclaw(ls, rs, 340, 750);
 
   switch (dir)
   {
@@ -501,12 +511,12 @@ void turnLeft(byte turns)
   }
   if (turns % 4 == 3)
   {
-    roboclaw(88, 168, 165, 750);
+    roboclaw(88, 168, 161, 750);
     roboclaw(41, 168, 60, 750);
   }
   if (turns % 4 == 1)
   {
-    roboclaw(40, 216, 165, 750);
+    roboclaw(40, 216, 161, 750);
     roboclaw(41, 168, 60, 750);
   }
 }

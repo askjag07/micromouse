@@ -313,7 +313,7 @@ void moveTo(int r, int c)
   else
   {
     Array<int, 2> curr = trail.pop();
-    while (!((curr[0] == r - 1 || curr[0] == r + 1) && curr[1] == c) || ((curr[1] == c - 1 || curr[1] == c + 1) && curr[0] == r))
+    while (!(((curr[0] == r - 1 || curr[0] == r + 1) && curr[1] == c) || ((curr[1] == c - 1 || curr[1] == c + 1) && curr[0] == r)))
     {
       moveTo(curr[0], curr[1]);
       curr = trail.pop();

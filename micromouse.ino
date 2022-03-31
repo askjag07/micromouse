@@ -420,7 +420,7 @@ bool checkWin()
  **/
 byte getSquares(byte d)
 {
-  hc[d].dist();
+  delay(25);
   return rnd(hc[d].dist() / 25.4); // (23.495 + 25.4) / 2 = 24.4475
 }
 
@@ -428,7 +428,7 @@ byte getSquares(byte d)
  *
  *
  **/
-byte lastMove = 0;
+boolean backup = false;
 
 // pre: front is clear
 // post: robot moves one square forward
@@ -437,16 +437,15 @@ void moveOne()
   byte ls = 90, rs = 216;
   int s0 = rnd(hc[0].dist()), s2 = rnd(hc[2].dist());
 
-  if (s2 < 2)
-    rs += 3;
-  else if (s2 < 4 || (s0 > 4 && s0 < 10))
-    rs += 2;
-  if (s0 < 2)
-    ls += 2;
-  else if (s0 < 4 || (s2 > 4 && s2 < 10))
-    ls++;
+  if (s2 < 4 || (s0 > 4 && s0 < 10))
+    ls--;
+  if (s0 < 4 || (s2 > 4 && s2 < 10))
+    rs -= 2;
 
-  roboclaw(ls, rs, 340, 750);
+  if (getSquares(1) > 1)
+    roboclaw(ls, rs, 340, 750);
+  else
+    roboclaw(ls, rs, 750);
 
   switch (dir)
   {
@@ -477,7 +476,7 @@ void moveBackOne()
   if (s0 < 4 || (s2 > 5 && s2 < 10))
     ls -= 2;
 
-  roboclaw(ls, rs, 340, 750);
+  roboclaw(ls, rs, 345, 750);
 
   switch (dir)
   {
@@ -509,15 +508,38 @@ void turnLeft(byte turns)
     dir += turns * 3;
     dir %= 4;
   }
+  boolean wall = hc[1].dist() < 5;
   if (turns % 4 == 3)
   {
-    roboclaw(88, 168, 161, 750);
-    roboclaw(41, 168, 60, 750);
+    if (wall)
+    {
+      roboclaw(88, 168, 81, 750);
+      roboclaw(86, 216, 17, 750);
+      roboclaw(88, 168, 81, 750);
+      roboclaw(41, 168, 100, 750);
+    }
+    else
+    {
+      roboclaw(86, 216, 30, 750);
+      roboclaw(88, 168, 161, 750);
+      roboclaw(41, 168, 100, 750);
+    }
   }
   if (turns % 4 == 1)
   {
-    roboclaw(40, 216, 161, 750);
-    roboclaw(41, 168, 60, 750);
+    if (wall)
+    {
+      roboclaw(40, 216, 81, 750);
+      roboclaw(86, 216, 20, 750);
+      roboclaw(40, 216, 84, 750);
+      roboclaw(41, 168, 40, 750);
+    }
+    else
+    {
+      roboclaw(86, 216, 30, 750);
+      roboclaw(40, 216, 161, 750);
+      roboclaw(41, 168, 100, 750);
+    }
   }
 }
 
@@ -539,6 +561,20 @@ void roboclaw(byte left, byte right, int numHoles, int dlay)
         encValue = 0;
       }
     }
+
+  serial.write(64);  // left
+  serial.write(192); // right
+
+  delay(dlay);
+}
+
+void roboclaw(byte left, byte right, int dlay)
+{
+  serial.write(left);
+  serial.write(right);
+
+  while (hc[1].dist() > 8)
+    delay(25);
 
   serial.write(64);  // left
   serial.write(192); // right

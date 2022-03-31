@@ -434,18 +434,13 @@ boolean backup = false;
 // post: robot moves one square forward
 void moveOne()
 {
-  byte ls = 90, rs = 216;
+  byte ls = 88, rs = 216;
   int s0 = rnd(hc[0].dist()), s2 = rnd(hc[2].dist());
 
-  if (s2 < 4 || (s0 > 4 && s0 < 10))
-    ls--;
-  if (s0 < 4 || (s2 > 4 && s2 < 10))
-    rs -= 2;
+  if (s0 < 3 || (s2 > 5 && s2 < 10))
+    ls++;
 
-  if (getSquares(1) > 1)
-    roboclaw(ls, rs, 340, 750);
-  else
-    roboclaw(ls, rs, 750);
+  roboclaw(ls, rs, 340, 750);
 
   switch (dir)
   {
@@ -515,13 +510,13 @@ void turnLeft(byte turns)
     {
       roboclaw(88, 168, 81, 750);
       roboclaw(86, 216, 17, 750);
-      roboclaw(88, 168, 81, 750);
+      roboclaw(88, 168, 84, 750);
       roboclaw(41, 168, 100, 750);
     }
     else
     {
       roboclaw(86, 216, 30, 750);
-      roboclaw(88, 168, 161, 750);
+      roboclaw(88, 168, 165, 750);
       roboclaw(41, 168, 100, 750);
     }
   }
@@ -551,7 +546,7 @@ void roboclaw(byte left, byte right, int numHoles, int dlay)
   serial.write(left);
   serial.write(right);
 
-  while (n <= numHoles)
+  while (n <= numHoles && hc[1].dist() > 2)
     if (e.read() != encValue)
     {
       encValue = e.read();
@@ -561,20 +556,6 @@ void roboclaw(byte left, byte right, int numHoles, int dlay)
         encValue = 0;
       }
     }
-
-  serial.write(64);  // left
-  serial.write(192); // right
-
-  delay(dlay);
-}
-
-void roboclaw(byte left, byte right, int dlay)
-{
-  serial.write(left);
-  serial.write(right);
-
-  while (hc[1].dist() > 8)
-    delay(25);
 
   serial.write(64);  // left
   serial.write(192); // right

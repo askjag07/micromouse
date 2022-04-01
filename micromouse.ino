@@ -440,7 +440,7 @@ void test()
 void moveOne()
 {
   byte ls = 88, rs = 216;
-  roboclaw(ls, rs, 950, 750);
+  roboclaw(ls, rs, 950, 750, true);
 
   switch (dir)
   {
@@ -464,7 +464,7 @@ void moveOne()
 void moveBackOne()
 {
   byte ls = 40, rs = 168;
-  roboclaw(ls, rs, 950, 750);
+  roboclaw(ls, rs, 950, 750, true);
 
   switch (dir)
   {
@@ -501,37 +501,37 @@ void turnLeft(byte turns)
   {
     if (wall)
     {
-      roboclaw(88, 168, 81, 750);
-      roboclaw(86, 216, 17, 750);
-      roboclaw(88, 168, 84, 750);
-      roboclaw(41, 168, 100, 750);
+      roboclaw(88, 168, 81, 750, false);
+      roboclaw(86, 216, 17, 750, false);
+      roboclaw(88, 168, 84, 750, false);
+      roboclaw(41, 168, 100, 750, false);
     }
     else
     {
-      roboclaw(86, 216, 30, 750);
-      roboclaw(88, 168, 165, 750);
-      roboclaw(41, 168, 100, 750);
+      roboclaw(86, 216, 30, 750, false);
+      roboclaw(88, 168, 165, 750, false);
+      roboclaw(41, 168, 100, 750, false);
     }
   }
   if (turns % 4 == 1)
   {
     if (wall)
     {
-      roboclaw(40, 216, 81, 750);
-      roboclaw(86, 216, 20, 750);
-      roboclaw(40, 216, 84, 750);
-      roboclaw(41, 168, 40, 750);
+      roboclaw(40, 216, 81, 750, false);
+      roboclaw(86, 216, 20, 750, false);
+      roboclaw(40, 216, 84, 750, false);
+      roboclaw(41, 168, 40, 750, false);
     }
     else
     {
-      roboclaw(86, 216, 30, 750);
-      roboclaw(40, 216, 161, 750);
-      roboclaw(41, 168, 100, 750);
+      roboclaw(86, 216, 30, 750, false);
+      roboclaw(40, 216, 161, 750, false);
+      roboclaw(41, 168, 100, 750, false);
     }
   }
 }
 
-void roboclaw(byte left, byte right, int milliseconds, int dlay)
+void roboclaw(byte left, byte right, int milliseconds, int dlay, bool adjust)
 {
   int n = 0;
   byte encValue = 0;
@@ -539,11 +539,13 @@ void roboclaw(byte left, byte right, int milliseconds, int dlay)
   serial.write(left);
   serial.write(right);
 
-  delay(milliseconds - 43);
+  if(adjust)
+    delay(milliseconds - 43);
 
   serial.write(192); // right
 
-  delay(43);
+  if(adjust)
+    delay(43);
 
   serial.write(64); // left
 

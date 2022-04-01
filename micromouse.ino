@@ -178,18 +178,17 @@ void solve()
   // [row of where it came from, col of where it came from, visited (0 unvisited, 1 visited)]
   Array<Array<Array<int, 3>, 10>, 10> locs;
   Queue toVisit;
-  Array<int, 3> start;
+  Array<int, 2> start;
   start[0] = 0;
   start[1] = 0;
-  start[2] = 0;
   toVisit.enqueue(start);
 
   while (!toVisit.isEmpty())
   {
-    Array<int, 3> nextLoc = toVisit.dequeue();
+    Array<int, 2> nextLoc = toVisit.dequeue();
     currRow = nextLoc[0];
     currCol = nextLoc[1];
-    nextLoc[2] = 1;
+    locs[currRow][currCol][2] = 1;
     if (currRow == winX && currCol == winY)
     {
       break;
@@ -201,7 +200,7 @@ void solve()
       temp[0] = currRow - 1;
       temp[1] = currCol;
       toVisit.enqueue(temp);
-      // updates locs
+      // updates locs for the next location
       Array<int, 3> temp1;
       temp1[0] = currRow;
       temp1[1] = currCol;

@@ -95,14 +95,12 @@ void setup()
   squares[0][0].left = 1;
   squares[0][0].visited = true;
 
-  // Implement calibrate.
-  // explore();
-  // solve();
+  explore();
+  solve();
 }
 
 void loop()
 {
-  test();
 }
 
 // explores the maze, gathering data and finding the winning square
@@ -424,23 +422,20 @@ byte getSquares(byte d)
   return rnd(hc[d].dist() / 25.4); // (23.495 + 25.4) / 2 = 24.4475
 }
 
-/**
- *
- *
- **/
-boolean backup = false;
-
-void test()
-{
-  moveOne();
-}
-
 // pre: front is clear
 // post: robot moves one square forward
 void moveOne()
 {
-  byte ls = 88, rs = 216;
-  roboclaw(ls, rs, 950, 750, true);
+  if (getSquares(1) == 1)
+  {
+    serial.write(88);
+    serial.write(216);
+    while (hc[1].dist() > 5)
+      ;
+    roboclaw(88, 216, 43, 750, true);
+  }
+  else
+    roboclaw(88, 216, 950, 750, true);
 
   switch (dir)
   {
@@ -496,37 +491,37 @@ void turnLeft(byte turns)
     dir += turns * 3;
     dir %= 4;
   }
-  boolean wall = hc[1].dist() < 5;
+  boolean wall = getSquares(1) == 0;
   if (turns % 4 == 3)
   {
     if (wall)
     {
-      roboclaw(88, 168, 81, 750, false);
-      roboclaw(86, 216, 17, 750, false);
-      roboclaw(88, 168, 84, 750, false);
-      roboclaw(41, 168, 100, 750, false);
+      roboclaw(88, 168, 280, 750, false);
+      roboclaw(86, 216, 100, 750, false);
+      roboclaw(88, 168, 280, 750, false);
+      roboclaw(41, 168, 400, 750, false);
     }
     else
     {
-      roboclaw(86, 216, 30, 750, false);
-      roboclaw(88, 168, 165, 750, false);
-      roboclaw(41, 168, 100, 750, false);
+      roboclaw(86, 216, 150, 750, false);
+      roboclaw(88, 168, 515, 750, false);
+      roboclaw(41, 168, 380, 750, false);
     }
   }
   if (turns % 4 == 1)
   {
     if (wall)
     {
-      roboclaw(40, 216, 81, 750, false);
-      roboclaw(86, 216, 20, 750, false);
-      roboclaw(40, 216, 84, 750, false);
-      roboclaw(41, 168, 40, 750, false);
+      roboclaw(40, 216, 280, 750, false);
+      roboclaw(86, 216, 100, 750, false);
+      roboclaw(40, 216, 280, 750, false);
+      roboclaw(41, 168, 400, 750, false);
     }
     else
     {
-      roboclaw(86, 216, 30, 750, false);
-      roboclaw(40, 216, 161, 750, false);
-      roboclaw(41, 168, 100, 750, false);
+      roboclaw(86, 216, 150, 750, false);
+      roboclaw(40, 216, 515, 750, false);
+      roboclaw(41, 168, 380, 750, false);
     }
   }
 }
@@ -539,12 +534,11 @@ void roboclaw(byte left, byte right, int milliseconds, int dlay, bool adjust)
   serial.write(left);
   serial.write(right);
 
-  if(adjust)
-    delay(milliseconds - 43);
+  delay(milliseconds - (adjust ? 43 : 0));
 
   serial.write(192); // right
 
-  if(adjust)
+  if (adjust)
     delay(43);
 
   serial.write(64); // left

@@ -118,8 +118,8 @@ void explore()
 
     // update trail, which is used for backtracking
     Array<int, 2> vect;
-    vect[0] = row;
-    vect[1] = col;
+    vect.push_back(row);
+    vect.push_back(col);
     trail.push(vect);
 
     // check for the middle. if we found the middle, break out of the loop

@@ -118,8 +118,8 @@ void explore()
 
     // update trail, which is used for backtracking
     Array<int, 2> vect;
-    vect.push_back(row);
-    vect.push_back(col);
+    vect[0] = row;
+    vect[1] = col;
     trail.push(vect);
 
     // check for the middle. if we found the middle, break out of the loop
@@ -271,12 +271,14 @@ void solve()
 // 0 is up, 1 is right, 2 is down, 3 is left
 void moveTo(int r, int c)
 {
+  Serial.print(r);
+  Serial.print(" - ");
+  Serial.println(c);
   if (r == row && c == col)
     return;
   // if the target square is adjacent to the current square
   bool adj = ((r == row - 1 || r == row + 1) && c == col) || ((c == col - 1 || c == col + 1) && r == row);
-  if (adj && (dir == 0 && squares[row][col].up == 0 || dir == 1 && squares[row][col].right == 0 || dir == 2 && squares[row][col].down == 0
-    || dir == 3 && squares[row][col].left == 0))
+  if (adj && (dir == 0 && squares[row][col].up == 0 || dir == 1 && squares[row][col].right == 0 || dir == 2 && squares[row][col].down == 0 || dir == 3 && squares[row][col].left == 0))
   {
 
     if (r == row - 1)
@@ -436,12 +438,13 @@ void moveOne()
   {
     serial.write(88);
     serial.write(216);
-    while (hc[1].dist() > 5)
-      ;
-    roboclaw(88, 216, 43, 750, true);
+    while (hc[1].dist() > 6)
+    {
+    }
+    roboclaw(88, 216, 35, 750, true);
   }
   else
-    roboclaw(88, 216, 950, 750, true);
+    roboclaw(88, 216, 930, 750, true);
 
   switch (dir)
   {
@@ -465,7 +468,7 @@ void moveOne()
 void moveBackOne()
 {
   byte ls = 40, rs = 168;
-  roboclaw(ls, rs, 950, 750, true);
+  roboclaw(ls, rs, 930, 750, true);
 
   switch (dir)
   {
@@ -502,32 +505,32 @@ void turnLeft(byte turns)
   {
     if (wall)
     {
-      roboclaw(88, 168, 280, 750, false);
+      roboclaw(88, 168, 275, 750, false);
       roboclaw(86, 216, 100, 750, false);
-      roboclaw(88, 168, 280, 750, false);
+      roboclaw(88, 168, 275, 750, false);
       roboclaw(41, 168, 400, 750, false);
     }
     else
     {
       roboclaw(86, 216, 150, 750, false);
-      roboclaw(88, 168, 515, 750, false);
-      roboclaw(41, 168, 380, 750, false);
+      roboclaw(88, 168, 550, 750, false);
+      roboclaw(41, 168, 375, 750, false);
     }
   }
   if (turns % 4 == 1)
   {
     if (wall)
     {
-      roboclaw(40, 216, 280, 750, false);
+      roboclaw(40, 216, 275, 750, false);
       roboclaw(86, 216, 100, 750, false);
-      roboclaw(40, 216, 280, 750, false);
+      roboclaw(40, 216, 275, 750, false);
       roboclaw(41, 168, 400, 750, false);
     }
     else
     {
       roboclaw(86, 216, 150, 750, false);
-      roboclaw(40, 216, 515, 750, false);
-      roboclaw(41, 168, 380, 750, false);
+      roboclaw(40, 216, 550, 750, false);
+      roboclaw(41, 168, 375, 750, false);
     }
   }
 }
@@ -540,12 +543,12 @@ void roboclaw(byte left, byte right, int milliseconds, int dlay, bool adjust)
   serial.write(left);
   serial.write(right);
 
-  delay(milliseconds - (adjust ? 43 : 0));
+  delay(milliseconds - (adjust ? 35 : 0));
 
   serial.write(192); // right
 
   if (adjust)
-    delay(43);
+    delay(35);
 
   serial.write(64); // left
 

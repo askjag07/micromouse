@@ -319,6 +319,7 @@ void moveTo(int r, int c)
       curr = trail.pop();
     }
     moveTo(curr[0], curr[1]);
+    trail.push(curr);
     moveTo(r, c);
   }
   // marks target square as visited

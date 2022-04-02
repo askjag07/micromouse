@@ -274,7 +274,9 @@ void moveTo(int r, int c)
   if (r == row && c == col)
     return;
   // if the target square is adjacent to the current square
-  if (((r == row - 1 || r == row + 1) && c == col) || ((c == col - 1 || c == col + 1) && r == row))
+  bool adj = ((r == row - 1 || r == row + 1) && c == col) || ((c == col - 1 || c == col + 1) && r == row);
+  if (adj && (dir == 0 && squares[row][col].up == 0 || dir == 1 && squares[row][col].right == 0 || dir == 2 && squares[row][col].down == 0
+    || dir == 3 && squares[row][col].left == 0))
   {
 
     if (r == row - 1)

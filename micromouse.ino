@@ -247,6 +247,10 @@ void solve()
   }
   Stack shortestPath;
   Array<int, 3> nextSquare = locs[winX][winY];
+  Array<int, 2> winnerSquare;
+  winnerSquare[0] = winX;
+  winnerSquare[1] = winY;
+  shortestPath.push(winnerSquare);
   while (nextSquare[0] != row && nextSquare[1] != col)
   {
     Array<int, 2> loc1;

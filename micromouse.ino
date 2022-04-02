@@ -271,8 +271,11 @@ void solve()
 // 0 is up, 1 is right, 2 is down, 3 is left
 void moveTo(int r, int c)
 {
+  Serial.print(row);
+  Serial.print(" -a ");
+  Serial.println(col);
   Serial.print(r);
-  Serial.print(" - ");
+  Serial.print(" -b ");
   Serial.println(c);
   if (r == row && c == col)
     return;

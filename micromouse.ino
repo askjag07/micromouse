@@ -1,5 +1,3 @@
-/* Moves forward one revolution with 3s breaks */
-
 #include <SoftwareSerial.h>
 #include <Encoder.h>
 #include <HCSR04.h>

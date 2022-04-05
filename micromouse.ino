@@ -1,10 +1,10 @@
-#include <SoftwareSerial.h>
+#include <Servo.h>
 #include <Encoder.h>
 #include <HCSR04.h>
 #include <Array.h>
 
-SoftwareSerial serial(7, 8);
-Encoder e(18, 19);
+Servo lmtr, rmtr;
+Encoder lenc(18, 19), renc(20, 21);
 
 HCSR04 left(3, 4);
 HCSR04 front(5, 6);
@@ -90,7 +90,11 @@ int winX = -1, winY = -1;
 void setup()
 {
   Serial.begin(38400);
-  serial.begin(115200);
+
+  // Attach motors
+  lmtr.attach(7);
+  rmtr.attach(8);
+
   // sets back wall of first square to closed and marks it as visited
   squares[0][0].left = 1;
   squares[0][0].visited = true;
@@ -101,6 +105,7 @@ void setup()
 
 void loop()
 {
+  test();
 }
 
 // explores the maze, gathering data and finding the winning square
@@ -271,19 +276,17 @@ void solve()
 // 0 is up, 1 is right, 2 is down, 3 is left
 void moveTo(int r, int c)
 {
-  Serial.print(row);
-  Serial.print(" -a ");
-  Serial.println(col);
-  Serial.print(r);
-  Serial.print(" -b ");
-  Serial.println(c);
   if (r == row && c == col)
     return;
   // if the target square is adjacent to the current square
   bool adj = ((r == row - 1 || r == row + 1) && c == col) || ((c == col - 1 || c == col + 1) && r == row);
-  if (adj && (dir == 0 && squares[row][col].up == 0 || dir == 1 && squares[row][col].right == 0 || dir == 2 && squares[row][col].down == 0 || dir == 3 && squares[row][col].left == 0))
-  {
 
+  int rdir = r - row, cdir = c - col;
+  if (adj && ((rdir == -1 && squares[row][col].up == 0) ||
+              (cdir == 1 && squares[row][col].right == 0) ||
+              (rdir == 1 && squares[row][col].down == 0) ||
+              (cdir == -1 && squares[row][col].left == 0)))
+  {
     if (r == row - 1)
       if (dir == 2)
         moveBackOne();
@@ -434,10 +437,15 @@ byte getSquares(byte d)
   return rnd(hc[d].dist() / 25.4); // (23.495 + 25.4) / 2 = 24.4475
 }
 
+// Autocorrect heading
+
+boolean backward = false;
+
 // pre: front is clear
 // post: robot moves one square forward
 void moveOne()
 {
+  backward = false;
   if (getSquares(1) == 1)
   {
     serial.write(88);
@@ -445,7 +453,7 @@ void moveOne()
     while (hc[1].dist() > 6)
     {
     }
-    roboclaw(88, 216, 35, 750, true);
+    roboclaw(88, 216, 33, 750, true);
   }
   else
     roboclaw(88, 216, 930, 750, true);
@@ -471,6 +479,7 @@ void moveOne()
 // post: robot moves one square backward
 void moveBackOne()
 {
+  backward = true;
   byte ls = 40, rs = 168;
   roboclaw(ls, rs, 930, 750, true);
 
@@ -493,12 +502,14 @@ void moveBackOne()
 
 void move(byte squares)
 {
+  backward = false;
   for (byte i = 0; i < squares; i++)
     moveOne();
 }
 
 void turnLeft(byte turns)
 {
+  backward = false;
   if (turns % 2 != 0)
   {
     dir += turns * 3;
@@ -509,15 +520,15 @@ void turnLeft(byte turns)
   {
     if (wall)
     {
-      roboclaw(88, 168, 275, 750, false);
+      roboclaw(88, 168, 279, 750, false);
       roboclaw(86, 216, 100, 750, false);
-      roboclaw(88, 168, 275, 750, false);
+      roboclaw(88, 168, 279, 750, false);
       roboclaw(41, 168, 400, 750, false);
     }
     else
     {
       roboclaw(86, 216, 150, 750, false);
-      roboclaw(88, 168, 550, 750, false);
+      roboclaw(88, 168, 510 + (backward == true ? 20 : 0), 750, false);
       roboclaw(41, 168, 375, 750, false);
     }
   }
@@ -525,18 +536,33 @@ void turnLeft(byte turns)
   {
     if (wall)
     {
-      roboclaw(40, 216, 275, 750, false);
+      roboclaw(40, 216, 279, 750, false);
       roboclaw(86, 216, 100, 750, false);
-      roboclaw(40, 216, 275, 750, false);
+      roboclaw(40, 216, 279, 750, false);
       roboclaw(41, 168, 400, 750, false);
     }
     else
     {
       roboclaw(86, 216, 150, 750, false);
-      roboclaw(40, 216, 550, 750, false);
+      roboclaw(40, 216, 510 + (backward == true ? 20 : 0), 750, false);
       roboclaw(41, 168, 375, 750, false);
     }
   }
+}
+
+void test()
+{
+  lenc.write();
+  renc.write();
+
+  lmtr.write(180);
+  rmtr.write(180);
+  delay(1000);
+
+  lenc.read();
+  renc.read();
+
+  delay(1000);
 }
 
 void roboclaw(byte left, byte right, int milliseconds, int dlay, bool adjust)
@@ -547,12 +573,12 @@ void roboclaw(byte left, byte right, int milliseconds, int dlay, bool adjust)
   serial.write(left);
   serial.write(right);
 
-  delay(milliseconds - (adjust ? 35 : 0));
+  delay(milliseconds - (adjust ? 33 : 0));
 
   serial.write(192); // right
 
   if (adjust)
-    delay(35);
+    delay(33);
 
   serial.write(64); // left
 

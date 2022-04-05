@@ -2,6 +2,7 @@
 #include <Encoder.h>
 #include <HCSR04.h>
 #include <Array.h>
+#include <Servo.h>
 
 Servo lmtr, rmtr;
 Encoder lenc(18, 19), renc(20, 21);
@@ -289,7 +290,13 @@ void moveTo(int r, int c)
   {
     if (r == row - 1)
       if (dir == 2)
-        moveBackOne();
+        if (squares[row][col].right == 1 && squares[row][col].left == 1) {
+          moveBackOne();
+        }
+        else {
+          turnLeft(1); turnLeft(1);
+          moveOne();
+        }
       else
       {
         turnLeft(dir);
@@ -297,7 +304,13 @@ void moveTo(int r, int c)
       }
     if (r == row + 1)
       if (dir == 0)
-        moveBackOne();
+        if (squares[row][col].right == 1 && squares[row][col].left == 1) {
+          moveBackOne();
+        }
+        else {
+          turnLeft(1); turnLeft(1);
+          moveOne();
+        }
       else
       {
         turnLeft((dir + 2) % 4);
@@ -305,7 +318,13 @@ void moveTo(int r, int c)
       }
     if (c == col + 1)
       if (dir == 3)
-        moveBackOne();
+        if (squares[row][col].up == 1 && squares[row][col].down == 1) {
+          moveBackOne();
+        }
+        else {
+          turnLeft(1); turnLeft(1);
+          moveOne();
+        }
       else
       {
         turnLeft((dir + 3) % 4);
@@ -313,7 +332,13 @@ void moveTo(int r, int c)
       }
     if (c == col - 1)
       if (dir == 1)
-        moveBackOne();
+        if (squares[row][col].up == 1 && squares[row][col].down == 1) {
+          moveBackOne();
+        }
+        else {
+          turnLeft(1); turnLeft(1);
+          moveOne();
+        }
       else
       {
         turnLeft((dir + 1) % 4);

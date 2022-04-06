@@ -1,10 +1,10 @@
-#include <Servo.h>
+#include <SoftwareSerial.h>
 #include <Encoder.h>
 #include <HCSR04.h>
 #include <Array.h>
-#include <Servo.h>
 
-Servo lmtr, rmtr;
+SoftwareSerial serial(8, 7);
+
 Encoder lenc(18, 19), renc(20, 21);
 
 HCSR04 left(3, 4);
@@ -91,22 +91,35 @@ int winX = -1, winY = -1;
 void setup()
 {
   Serial.begin(38400);
-
-  // Attach motors
-  lmtr.attach(7);
-  rmtr.attach(8);
+  serial.begin(115200);
 
   // sets back wall of first square to closed and marks it as visited
   squares[0][0].left = 1;
   squares[0][0].visited = true;
 
-  explore();
-  solve();
+  moveOne();
+  moveBackOne();
+
+  // explore();
+  // solve();
 }
 
 void loop()
-{
-  test();
+{ /*
+   long newLEncPos = lenc.read();
+   if (newLEncPos != lEncPos)
+   {
+     lEncPos = newLEncPos;
+     Serial.print("L~~");
+     Serial.println(lEncPos);
+   }
+   long newREncPos = renc.read();
+   if (newREncPos != rEncPos)
+   {
+     rEncPos = newREncPos;
+     Serial.print("R~~");
+     Serial.println(rEncPos);
+   }*/
 }
 
 // explores the maze, gathering data and finding the winning square
@@ -290,11 +303,14 @@ void moveTo(int r, int c)
   {
     if (r == row - 1)
       if (dir == 2)
-        if (squares[row][col].right == 1 && squares[row][col].left == 1) {
+        if (squares[row][col].right == 1 && squares[row][col].left == 1)
+        {
           moveBackOne();
         }
-        else {
-          turnLeft(1); turnLeft(1);
+        else
+        {
+          turnLeft(1);
+          turnLeft(1);
           moveOne();
         }
       else
@@ -304,11 +320,14 @@ void moveTo(int r, int c)
       }
     if (r == row + 1)
       if (dir == 0)
-        if (squares[row][col].right == 1 && squares[row][col].left == 1) {
+        if (squares[row][col].right == 1 && squares[row][col].left == 1)
+        {
           moveBackOne();
         }
-        else {
-          turnLeft(1); turnLeft(1);
+        else
+        {
+          turnLeft(1);
+          turnLeft(1);
           moveOne();
         }
       else
@@ -318,11 +337,14 @@ void moveTo(int r, int c)
       }
     if (c == col + 1)
       if (dir == 3)
-        if (squares[row][col].up == 1 && squares[row][col].down == 1) {
+        if (squares[row][col].up == 1 && squares[row][col].down == 1)
+        {
           moveBackOne();
         }
-        else {
-          turnLeft(1); turnLeft(1);
+        else
+        {
+          turnLeft(1);
+          turnLeft(1);
           moveOne();
         }
       else
@@ -332,11 +354,14 @@ void moveTo(int r, int c)
       }
     if (c == col - 1)
       if (dir == 1)
-        if (squares[row][col].up == 1 && squares[row][col].down == 1) {
+        if (squares[row][col].up == 1 && squares[row][col].down == 1)
+        {
           moveBackOne();
         }
-        else {
-          turnLeft(1); turnLeft(1);
+        else
+        {
+          turnLeft(1);
+          turnLeft(1);
           moveOne();
         }
       else
@@ -462,79 +487,14 @@ byte getSquares(byte d)
   return rnd(hc[d].dist() / 25.4); // (23.495 + 25.4) / 2 = 24.4475
 }
 
-// Autocorrect heading
-
-boolean backward = false;
-
-// pre: front is clear
-// post: robot moves one square forward
-void moveOne()
-{
-  backward = false;
-  if (getSquares(1) == 1)
-  {
-    serial.write(88);
-    serial.write(216);
-    while (hc[1].dist() > 6)
-    {
-    }
-    roboclaw(88, 216, 33, 750, true);
-  }
-  else
-    roboclaw(88, 216, 930, 750, true);
-
-  switch (dir)
-  {
-  case 0:
-    row--;
-    break;
-  case 2:
-    row++;
-    break;
-  case 1:
-    col++;
-    break;
-  default:
-    col--;
-    break;
-  }
-}
-
-// pre: back is clear
-// post: robot moves one square backward
-void moveBackOne()
-{
-  backward = true;
-  byte ls = 40, rs = 168;
-  roboclaw(ls, rs, 930, 750, true);
-
-  switch (dir)
-  {
-  case 0:
-    row++;
-    break;
-  case 2:
-    row--;
-    break;
-  case 1:
-    col--;
-    break;
-  default:
-    col++;
-    break;
-  }
-}
-
 void move(byte squares)
 {
-  backward = false;
   for (byte i = 0; i < squares; i++)
     moveOne();
 }
 
 void turnLeft(byte turns)
 {
-  backward = false;
   if (turns % 2 != 0)
   {
     dir += turns * 3;
@@ -575,39 +535,133 @@ void turnLeft(byte turns)
   }
 }
 
-void test()
+void moveBackOne()
 {
-  lenc.write();
-  renc.write();
+  lenc.write(0);
+  renc.write(0);
 
-  lmtr.write(180);
-  rmtr.write(180);
-  delay(1000);
+  byte ls = 25, rs = 153;
+  unsigned long adjustmentDebounce = millis();
 
-  lenc.read();
-  renc.read();
+  serial.write(ls);
+  serial.write(rs);
 
-  delay(1000);
+  while ((lenc.read() * -1) < 1450)
+    if (millis() - adjustmentDebounce >= 500)
+    {
+      adjustmentDebounce = millis();
+
+      unsigned long lReading = (lenc.read() * -1), rReading = (renc.read() * -1);
+
+      if (rReading < lReading)
+        if (rs > 150)
+        {
+          rs--;
+          serial.write(rs);
+        }
+        else
+        {
+          ls++;
+          serial.write(ls);
+        }
+
+      if (lReading < rReading)
+        if (ls > 22)
+        {
+          ls--;
+          serial.write(ls);
+        }
+        else
+        {
+          rs++;
+          serial.write(rs);
+        };
+    }
+
+  serial.write(64);
+  serial.write(192);
+
+  switch (dir)
+  {
+  case 0:
+    row++;
+    break;
+  case 2:
+    row--;
+    break;
+  case 1:
+    col--;
+    break;
+  default:
+    col++;
+    break;
+  }
+
+  delay(750);
 }
 
-void roboclaw(byte left, byte right, int milliseconds, int dlay, bool adjust)
+void moveOne()
 {
-  int n = 0;
-  byte encValue = 0;
+  lenc.write(0);
+  renc.write(0);
 
-  serial.write(left);
-  serial.write(right);
+  byte ls = 102, rs = 230;
+  unsigned long adjustmentDebounce = millis();
 
-  delay(milliseconds - (adjust ? 33 : 0));
+  serial.write(ls);
+  serial.write(rs);
 
-  serial.write(192); // right
+  while (lenc.read() < 1250)
+    if (millis() - adjustmentDebounce >= 500)
+    {
+      adjustmentDebounce = millis();
 
-  if (adjust)
-    delay(33);
+      unsigned long lReading = lenc.read(), rReading = renc.read();
 
-  serial.write(64); // left
+      if (rReading < lReading)
+        if (rs < 233)
+        {
+          rs++;
+          serial.write(rs);
+        }
+        else
+        {
+          ls--;
+          serial.write(ls);
+        }
 
-  delay(dlay);
+      if (lReading < rReading)
+        if (ls < 105)
+        {
+          ls++;
+          serial.write(ls);
+        }
+        else
+        {
+          rs--;
+          serial.write(rs);
+        };
+    }
+  serial.write(64);
+  serial.write(192);
+
+  switch (dir)
+  {
+  case 0:
+    row--;
+    break;
+  case 2:
+    row++;
+    break;
+  case 1:
+    col++;
+    break;
+  default:
+    col--;
+    break;
+  }
+
+  delay(750);
 }
 
 int rnd(float n)

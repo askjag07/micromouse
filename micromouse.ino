@@ -488,36 +488,36 @@ void turnLeft(byte turns)
   if (turns % 4 == 3)
     if (wall)
     {
-      trnRight(340, 500);
-      mve(100, 500, false);
-      trnRight(340, 500);
-      mveBack(700, 500);
+      trnRight(350, 400);
+      mve(100, 400, false);
+      trnRight(350, 400);
+      mveBack(700, 400);
     }
     else
     {
-      mve(100, 500, false);
-      trnRight(840, 500);
-      mveBack(800, 500);
+      mve(100, 400, false);
+      trnRight(650, 400);
+      mveBack(400, 400);
     }
   if (turns % 4 == 1)
     if (wall)
     {
-      trnLeft(260, 500);
-      mve(100, 500, false);
-      trnLeft(260, 500);
-      mveBack(700, 500);
+      trnLeft(260, 400);
+      mve(100, 400, false);
+      trnLeft(260, 400);
+      mveBack(700, 400);
     }
     else
     {
-      mve(100, 500, false);
-      trnLeft(840, 500);
-      mveBack(800, 500);
+      mve(100, 400, false);
+      trnLeft(642, 400);
+      mveBack(400, 400);
     }
 }
 
 void moveBackOne()
 {
-  mveBack(1750, 500);
+  mveBack(1400, 400);
 
   switch (dir)
   {
@@ -538,7 +538,7 @@ void moveBackOne()
 
 void moveOne()
 {
-  mve(1250, 500, true);
+  mve(1400, 400, true);
 
   switch (dir)
   {
@@ -562,7 +562,7 @@ void mve(int pulses, int dlay, bool ismv1)
   lenc.write(0);
   renc.write(0);
 
-  byte ls = 94, rs = 222;
+  byte ls = 84, rs = 212;
   unsigned long adjustmentDebounce = millis();
 
   serial.write(ls);
@@ -578,7 +578,7 @@ void mve(int pulses, int dlay, bool ismv1)
       unsigned long lReading = lenc.read(), rReading = renc.read();
 
       if (rReading < lReading)
-        if (rs < 225)
+        if (rs < 215)
         {
           rs++;
           serial.write(rs);
@@ -590,7 +590,7 @@ void mve(int pulses, int dlay, bool ismv1)
         }
 
       if (lReading < rReading)
-        if (ls < 97)
+        if (ls < 87)
         {
           ls++;
           serial.write(ls);
@@ -612,7 +612,7 @@ void mveBack(int pulses, int dlay)
   lenc.write(0);
   renc.write(0);
 
-  byte ls = 37, rs = 165;
+  byte ls = 44, rs = 172;
   unsigned long adjustmentDebounce = millis();
 
   serial.write(ls);
@@ -626,7 +626,7 @@ void mveBack(int pulses, int dlay)
       unsigned long lReading = (lenc.read() * -1), rReading = (renc.read() * -1);
 
       if (rReading < lReading)
-        if (rs > 162)
+        if (rs > 169)
         {
           rs--;
           serial.write(rs);
@@ -638,7 +638,7 @@ void mveBack(int pulses, int dlay)
         }
 
       if (lReading < rReading)
-        if (ls > 34)
+        if (ls > 41)
         {
           ls--;
           serial.write(ls);
@@ -661,7 +661,7 @@ void trnRight(int pulses, int dlay)
   lenc.write(0);
   renc.write(0);
 
-  byte ls = 94, rs = 165;
+  byte ls = 84, rs = 172;
   unsigned long adjustmentDebounce = millis();
 
   serial.write(ls);
@@ -675,7 +675,7 @@ void trnRight(int pulses, int dlay)
       unsigned long lReading = lenc.read(), rReading = (renc.read() * -1);
 
       if (rReading < lReading)
-        if (rs > 162)
+        if (rs > 169)
         {
           rs--;
           serial.write(rs);
@@ -687,7 +687,7 @@ void trnRight(int pulses, int dlay)
         }
 
       if (lReading < rReading)
-        if (ls < 97)
+        if (ls < 87)
         {
           ls++;
           serial.write(ls);
@@ -710,7 +710,7 @@ void trnLeft(int pulses, int dlay)
   lenc.write(0);
   renc.write(0);
 
-  byte ls = 37, rs = 222;
+  byte ls = 44, rs = 212;
   unsigned long adjustmentDebounce = millis();
 
   serial.write(ls);
@@ -724,7 +724,7 @@ void trnLeft(int pulses, int dlay)
       unsigned long lReading = (lenc.read() * -1), rReading = renc.read();
 
       if (rReading < lReading)
-        if (rs < 225)
+        if (rs < 215)
         {
           rs++;
           serial.write(rs);
@@ -736,7 +736,7 @@ void trnLeft(int pulses, int dlay)
         }
 
       if (lReading < rReading)
-        if (ls > 34)
+        if (ls > 41)
         {
           ls--;
           serial.write(ls);

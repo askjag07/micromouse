@@ -97,29 +97,12 @@ void setup()
   squares[0][0].left = 1;
   squares[0][0].visited = true;
 
-  moveOne();
-  moveBackOne();
-
-  // explore();
-  // solve();
+  explore();
+  solve();
 }
 
 void loop()
-{ /*
-   long newLEncPos = lenc.read();
-   if (newLEncPos != lEncPos)
-   {
-     lEncPos = newLEncPos;
-     Serial.print("L~~");
-     Serial.println(lEncPos);
-   }
-   long newREncPos = renc.read();
-   if (newREncPos != rEncPos)
-   {
-     rEncPos = newREncPos;
-     Serial.print("R~~");
-     Serial.println(rEncPos);
-   }*/
+{
 }
 
 // explores the maze, gathering data and finding the winning square
@@ -500,86 +483,41 @@ void turnLeft(byte turns)
     dir += turns * 3;
     dir %= 4;
   }
-  boolean wall = getSquares(1) == 0;
+
+  bool wall = getSquares(1) == 0;
   if (turns % 4 == 3)
-  {
     if (wall)
     {
-      roboclaw(88, 168, 279, 750, false);
-      roboclaw(86, 216, 100, 750, false);
-      roboclaw(88, 168, 279, 750, false);
-      roboclaw(41, 168, 400, 750, false);
+      trnRight(340, 500);
+      mve(100, 500, false);
+      trnRight(340, 500);
+      mveBack(700, 500);
     }
     else
     {
-      roboclaw(86, 216, 150, 750, false);
-      roboclaw(88, 168, 510 + (backward == true ? 20 : 0), 750, false);
-      roboclaw(41, 168, 375, 750, false);
+      mve(100, 500, false);
+      trnRight(840, 500);
+      mveBack(800, 500);
     }
-  }
   if (turns % 4 == 1)
-  {
     if (wall)
     {
-      roboclaw(40, 216, 279, 750, false);
-      roboclaw(86, 216, 100, 750, false);
-      roboclaw(40, 216, 279, 750, false);
-      roboclaw(41, 168, 400, 750, false);
+      trnLeft(260, 500);
+      mve(100, 500, false);
+      trnLeft(260, 500);
+      mveBack(700, 500);
     }
     else
     {
-      roboclaw(86, 216, 150, 750, false);
-      roboclaw(40, 216, 510 + (backward == true ? 20 : 0), 750, false);
-      roboclaw(41, 168, 375, 750, false);
+      mve(100, 500, false);
+      trnLeft(840, 500);
+      mveBack(800, 500);
     }
-  }
 }
 
 void moveBackOne()
 {
-  lenc.write(0);
-  renc.write(0);
-
-  byte ls = 25, rs = 153;
-  unsigned long adjustmentDebounce = millis();
-
-  serial.write(ls);
-  serial.write(rs);
-
-  while ((lenc.read() * -1) < 1450)
-    if (millis() - adjustmentDebounce >= 500)
-    {
-      adjustmentDebounce = millis();
-
-      unsigned long lReading = (lenc.read() * -1), rReading = (renc.read() * -1);
-
-      if (rReading < lReading)
-        if (rs > 150)
-        {
-          rs--;
-          serial.write(rs);
-        }
-        else
-        {
-          ls++;
-          serial.write(ls);
-        }
-
-      if (lReading < rReading)
-        if (ls > 22)
-        {
-          ls--;
-          serial.write(ls);
-        }
-        else
-        {
-          rs++;
-          serial.write(rs);
-        };
-    }
-
-  serial.write(64);
-  serial.write(192);
+  mveBack(1750, 500);
 
   switch (dir)
   {
@@ -596,22 +534,43 @@ void moveBackOne()
     col++;
     break;
   }
-
-  delay(750);
 }
 
 void moveOne()
 {
+  mve(1250, 500, true);
+
+  switch (dir)
+  {
+  case 0:
+    row--;
+    break;
+  case 2:
+    row++;
+    break;
+  case 1:
+    col++;
+    break;
+  default:
+    col--;
+    break;
+  }
+}
+
+void mve(int pulses, int dlay, bool ismv1)
+{
   lenc.write(0);
   renc.write(0);
 
-  byte ls = 102, rs = 230;
+  byte ls = 94, rs = 222;
   unsigned long adjustmentDebounce = millis();
 
   serial.write(ls);
   serial.write(rs);
 
-  while (lenc.read() < 1250)
+  bool i = ismv1 && getSquares(1) == 1;
+
+  while (i ? hc[1].dist() > 6 : lenc.read() < pulses)
     if (millis() - adjustmentDebounce >= 500)
     {
       adjustmentDebounce = millis();
@@ -619,7 +578,7 @@ void moveOne()
       unsigned long lReading = lenc.read(), rReading = renc.read();
 
       if (rReading < lReading)
-        if (rs < 233)
+        if (rs < 225)
         {
           rs++;
           serial.write(rs);
@@ -631,7 +590,7 @@ void moveOne()
         }
 
       if (lReading < rReading)
-        if (ls < 105)
+        if (ls < 97)
         {
           ls++;
           serial.write(ls);
@@ -645,23 +604,153 @@ void moveOne()
   serial.write(64);
   serial.write(192);
 
-  switch (dir)
-  {
-  case 0:
-    row--;
-    break;
-  case 2:
-    row++;
-    break;
-  case 1:
-    col++;
-    break;
-  default:
-    col--;
-    break;
-  }
+  delay(dlay);
+}
 
-  delay(750);
+void mveBack(int pulses, int dlay)
+{
+  lenc.write(0);
+  renc.write(0);
+
+  byte ls = 37, rs = 165;
+  unsigned long adjustmentDebounce = millis();
+
+  serial.write(ls);
+  serial.write(rs);
+
+  while ((lenc.read() * -1) < pulses)
+    if (millis() - adjustmentDebounce >= 500)
+    {
+      adjustmentDebounce = millis();
+
+      unsigned long lReading = (lenc.read() * -1), rReading = (renc.read() * -1);
+
+      if (rReading < lReading)
+        if (rs > 162)
+        {
+          rs--;
+          serial.write(rs);
+        }
+        else
+        {
+          ls++;
+          serial.write(ls);
+        }
+
+      if (lReading < rReading)
+        if (ls > 34)
+        {
+          ls--;
+          serial.write(ls);
+        }
+        else
+        {
+          rs++;
+          serial.write(rs);
+        };
+    }
+
+  serial.write(64);
+  serial.write(192);
+
+  delay(dlay);
+}
+
+void trnRight(int pulses, int dlay)
+{
+  lenc.write(0);
+  renc.write(0);
+
+  byte ls = 94, rs = 165;
+  unsigned long adjustmentDebounce = millis();
+
+  serial.write(ls);
+  serial.write(rs);
+
+  while (lenc.read() < pulses)
+    if (millis() - adjustmentDebounce >= 500)
+    {
+      adjustmentDebounce = millis();
+
+      unsigned long lReading = lenc.read(), rReading = (renc.read() * -1);
+
+      if (rReading < lReading)
+        if (rs > 162)
+        {
+          rs--;
+          serial.write(rs);
+        }
+        else
+        {
+          ls--;
+          serial.write(ls);
+        }
+
+      if (lReading < rReading)
+        if (ls < 97)
+        {
+          ls++;
+          serial.write(ls);
+        }
+        else
+        {
+          rs++;
+          serial.write(rs);
+        };
+    }
+
+  serial.write(64);
+  serial.write(192);
+
+  delay(dlay);
+}
+
+void trnLeft(int pulses, int dlay)
+{
+  lenc.write(0);
+  renc.write(0);
+
+  byte ls = 37, rs = 222;
+  unsigned long adjustmentDebounce = millis();
+
+  serial.write(ls);
+  serial.write(rs);
+
+  while ((lenc.read() * -1) < pulses)
+    if (millis() - adjustmentDebounce >= 500)
+    {
+      adjustmentDebounce = millis();
+
+      unsigned long lReading = (lenc.read() * -1), rReading = renc.read();
+
+      if (rReading < lReading)
+        if (rs < 225)
+        {
+          rs++;
+          serial.write(rs);
+        }
+        else
+        {
+          ls++;
+          serial.write(ls);
+        }
+
+      if (lReading < rReading)
+        if (ls > 34)
+        {
+          ls--;
+          serial.write(ls);
+        }
+        else
+        {
+          rs--;
+          serial.write(rs);
+        };
+    }
+  serial.write(64);
+  serial.write(192);
+
+  delay(dlay);
 }
 
 int rnd(float n)

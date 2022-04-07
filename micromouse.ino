@@ -176,7 +176,8 @@ void solve()
   int currRow = row;
   int currCol = col;
   // [row of where it came from, col of where it came from, visited (0 unvisited, 1 visited)]
-  Array<Array<Array<int, 3>, 10>, 10> locs;
+  int locs[10][10][3];
+  
   Queue toVisit;
   Array<int, 2> start;
   start[0] = 0;
@@ -201,11 +202,9 @@ void solve()
       temp[1] = currCol;
       toVisit.enqueue(temp);
       // updates locs for the next location
-      Array<int, 3> temp1;
-      temp1[0] = currRow;
-      temp1[1] = currCol;
-      temp1[2] = 0;
-      locs[currRow - 1][currCol] = temp1;
+      locs[currRow - 1][currCol][0] = currRow;
+      locs[currRow - 1][currCol][1] = currCol;
+      locs[currRow - 1][currCol][2] = 0;
     }
     if (squares[currRow][currCol].right == 0 && locs[currRow][currCol + 1][2] == 0)
     {
@@ -214,11 +213,9 @@ void solve()
       temp[1] = currCol + 1;
       toVisit.enqueue(temp);
 
-      Array<int, 3> temp1;
-      temp1[0] = currRow;
-      temp1[1] = currCol;
-      temp1[2] = 0;
-      locs[currRow][currCol + 1] = temp1;
+      locs[currRow][currCol + 1][0] = currRow;
+      locs[currRow][currCol + 1][1] = currCol;
+      locs[currRow][currCol + 1][2] = 0;
     }
     if (squares[currRow][currCol].down == 0 && locs[currRow + 1][currCol][2] == 0)
     {
@@ -227,11 +224,9 @@ void solve()
       temp[1] = currCol;
       toVisit.enqueue(temp);
 
-      Array<int, 3> temp1;
-      temp1[0] = currRow;
-      temp1[1] = currCol;
-      temp1[2] = 0;
-      locs[currRow + 1][currCol] = temp1;
+      locs[currRow + 1][currCol][0] = currRow;
+      locs[currRow + 1][currCol][1] = currCol;
+      locs[currRow + 1][currCol][2] = 0;
     }
     if (squares[currRow][currCol].left == 0 && locs[currRow][currCol - 1][2] == 0)
     {
@@ -240,11 +235,9 @@ void solve()
       temp[1] = currCol - 1;
       toVisit.enqueue(temp);
 
-      Array<int, 3> temp1;
-      temp1[0] = currRow;
-      temp1[1] = currCol;
-      temp1[2] = 0;
-      locs[currRow][currCol - 1] = temp1;
+      locs[currRow][currCol - 1][0] = currRow;
+      locs[currRow][currCol - 1][1] = currCol;
+      locs[currRow][currCol - 1][2] = 0;
     }
   }
   Stack shortestPath;

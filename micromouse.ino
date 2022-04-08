@@ -478,7 +478,7 @@ void turnLeft(byte turns)
   if (turns % 4 == 3)
   {
     trnRight(347, 400);
-    mve(100, 400, false);
+    mve(150, 400, false);
     trnRight(347, 400);
     mveBack(550, 400);
   }
@@ -492,7 +492,7 @@ void turnLeft(byte turns)
     if (getSquares(0) > 0)
     {
       trnLeft(303, 400);
-      mve(100, 400, false);
+      mve(150, 400, false);
       trnLeft(700, 400);
       mveBack(250, 400);
       trnLeft(303, 400);
@@ -500,7 +500,7 @@ void turnLeft(byte turns)
     else if (getSquares(2) > 0)
     {
       trnRight(345, 400);
-      mve(100, 400, false);
+      mve(150, 400, false);
       trnRight(720, 400);
       mveBack(250, 400);
       trnRight(345, 400);
@@ -508,7 +508,7 @@ void turnLeft(byte turns)
   if (turns % 4 == 1)
   {
     trnLeft(290, 400);
-    mve(100, 400, false);
+    mve(150, 400, false);
     trnLeft(290, 400);
     mveBack(550, 400);
   }
@@ -580,7 +580,7 @@ void mve(int pulses, int dlay, bool ismv1)
     {
       adjustmentDebounce = millis();
 
-      unsigned long lReading = lenc.read(), rReading = (int)(renc.read() * 1.0001);
+      unsigned long lReading = lenc.read(), rReading = renc.read();
 
       if (rReading < lReading)
         if (rs < 215)
@@ -628,7 +628,7 @@ void mveBack(int pulses, int dlay)
     {
       adjustmentDebounce = millis();
 
-      unsigned long lReading = (lenc.read() * -1), rReading = (int)((renc.read() * -1) * 1.0001);
+      unsigned long lReading = (lenc.read() * -1), rReading = (renc.read() * -1);
 
       if (rReading < lReading)
         if (rs > 169)

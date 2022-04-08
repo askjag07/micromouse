@@ -177,7 +177,7 @@ void solve()
   int currCol = col;
   // [row of where it came from, col of where it came from, visited (0 unvisited, 1 visited)]
   int locs[10][10][3];
-  
+
   Queue toVisit;
   Array<int, 2> start;
   start[0] = 0;
@@ -285,8 +285,7 @@ void moveTo(int r, int c)
         }
         else
         {
-          turnLeft(1);
-          turnLeft(1);
+          turnLeft(2);
           moveOne();
         }
       else
@@ -302,8 +301,7 @@ void moveTo(int r, int c)
         }
         else
         {
-          turnLeft(1);
-          turnLeft(1);
+          turnLeft(2);
           moveOne();
         }
       else
@@ -319,8 +317,7 @@ void moveTo(int r, int c)
         }
         else
         {
-          turnLeft(1);
-          turnLeft(1);
+          turnLeft(2);
           moveOne();
         }
       else
@@ -336,8 +333,7 @@ void moveTo(int r, int c)
         }
         else
         {
-          turnLeft(1);
-          turnLeft(1);
+          turnLeft(2);
           moveOne();
         }
       else
@@ -460,7 +456,8 @@ bool checkWin()
 byte getSquares(byte d)
 {
   delay(25);
-  return rnd(hc[d].dist() / 25.4); // (23.495 + 25.4) / 2 = 24.4475
+  byte s = rnd(hc[d].dist() / 25.4); // (23.495 + 25.4) / 2 = 24.4475
+  return s > 10 ? 0 : s;
 }
 
 void move(byte squares)
@@ -471,41 +468,56 @@ void move(byte squares)
 
 void turnLeft(byte turns)
 {
-  if (turns % 2 != 0)
+  if (turns % 4 != 0)
   {
     dir += turns * 3;
     dir %= 4;
   }
 
-  bool wall = getSquares(1) == 0;
+  // bool wall = getSquares(1) == 0;
   if (turns % 4 == 3)
-    if (wall)
+  {
+    trnRight(347, 400);
+    mve(100, 400, false);
+    trnRight(347, 400);
+    mveBack(550, 400);
+  }
+  /*else
+  {
+    mve(100, 400, false);
+    trnRight(730, 400);
+    mveBack(400, 400);
+  }*/
+  if (turns % 4 == 2)
+    if (getSquares(0) > 0)
     {
-      trnRight(350, 400);
+      trnLeft(303, 400);
       mve(100, 400, false);
-      trnRight(350, 400);
-      mveBack(700, 400);
+      trnLeft(700, 400);
+      mveBack(250, 400);
+      trnLeft(303, 400);
     }
-    else
+    else if (getSquares(2) > 0)
     {
+      trnRight(345, 400);
       mve(100, 400, false);
-      trnRight(650, 400);
-      mveBack(400, 400);
+      trnRight(720, 400);
+      mveBack(250, 400);
+      trnRight(345, 400);
     }
   if (turns % 4 == 1)
-    if (wall)
-    {
-      trnLeft(260, 400);
-      mve(100, 400, false);
-      trnLeft(260, 400);
-      mveBack(700, 400);
-    }
-    else
-    {
-      mve(100, 400, false);
-      trnLeft(642, 400);
-      mveBack(400, 400);
-    }
+  {
+    trnLeft(290, 400);
+    mve(100, 400, false);
+    trnLeft(290, 400);
+    mveBack(550, 400);
+  }
+  /*else
+  {
+    mve(100, 400, false);
+    trnLeft(642, 400);
+    mveBack(400, 400);
+  }*/
 }
 
 void moveBackOne()
@@ -531,7 +543,7 @@ void moveBackOne()
 
 void moveOne()
 {
-  mve(1400, 400, true);
+  mve(1395, 400, true);
 
   switch (dir)
   {
@@ -561,14 +573,14 @@ void mve(int pulses, int dlay, bool ismv1)
   serial.write(ls);
   serial.write(rs);
 
-  bool i = ismv1 && getSquares(1) == 1;
+  bool i = ismv1 && getSquares(1) < 2;
 
-  while (i ? hc[1].dist() > 6 : lenc.read() < pulses)
-    if (millis() - adjustmentDebounce >= 500)
+  while (i ? hc[1].dist() > 5.5 : lenc.read() < pulses)
+    if (millis() - adjustmentDebounce >= 200)
     {
       adjustmentDebounce = millis();
 
-      unsigned long lReading = lenc.read(), rReading = renc.read();
+      unsigned long lReading = lenc.read(), rReading = (int)(renc.read() * 1.0001);
 
       if (rReading < lReading)
         if (rs < 215)
@@ -612,11 +624,11 @@ void mveBack(int pulses, int dlay)
   serial.write(rs);
 
   while ((lenc.read() * -1) < pulses)
-    if (millis() - adjustmentDebounce >= 500)
+    if (millis() - adjustmentDebounce >= 200)
     {
       adjustmentDebounce = millis();
 
-      unsigned long lReading = (lenc.read() * -1), rReading = (renc.read() * -1);
+      unsigned long lReading = (lenc.read() * -1), rReading = (int)((renc.read() * -1) * 1.0001);
 
       if (rReading < lReading)
         if (rs > 169)
@@ -661,7 +673,7 @@ void trnRight(int pulses, int dlay)
   serial.write(rs);
 
   while (lenc.read() < pulses)
-    if (millis() - adjustmentDebounce >= 500)
+    if (millis() - adjustmentDebounce >= 200)
     {
       adjustmentDebounce = millis();
 
@@ -710,7 +722,7 @@ void trnLeft(int pulses, int dlay)
   serial.write(rs);
 
   while ((lenc.read() * -1) < pulses)
-    if (millis() - adjustmentDebounce >= 500)
+    if (millis() - adjustmentDebounce >= 200)
     {
       adjustmentDebounce = millis();
 

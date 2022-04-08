@@ -436,15 +436,28 @@ void setSquare()
 
 bool checkWin()
 {
+
   for (int r = 0; r < 9; r++)
     for (int c = 0; c < 9; c++)
-      if (squares[r][c].right == 0 && squares[r][c].down == 0 && squares[r + 1][c].up == 0 && squares[r + 1][c].right == 0 &&
+    {
+      int count = 0;
+      if (squares[r][c].up == 1 && squares[r][c].left == 1)
+        count++;
+      if (squares[r + 1][c].left == 1 && squares[r + 1][c].down == 1)
+        count++;
+      if (squares[r][c + 1].up == 1 && squares[r][c + 1].right == 1)
+        count++;
+      if (squares[r + 1][c + 1].right == 1 && squares[r + 1][c + 1].down == 1)
+        count++;
+
+      if (count == 3 && squares[r][c].right == 0 && squares[r][c].down == 0 && squares[r + 1][c].up == 0 && squares[r + 1][c].right == 0 &&
           squares[r][c + 1].left == 0 && squares[r][c + 1].down == 0 && squares[r + 1][c + 1].up == 0 && squares[r + 1][c + 1].left == 0)
       {
         winX = r;
         winY = c;
         return true;
       }
+    }
   return false;
 }
 
@@ -477,9 +490,9 @@ void turnLeft(byte turns)
   // bool wall = getSquares(1) == 0;
   if (turns % 4 == 3)
   {
-    trnRight(347, 400);
+    trnRight(351, 400);
     mve(150, 400, false);
-    trnRight(347, 400);
+    trnRight(350, 400);
     mveBack(550, 400);
   }
   /*else
@@ -491,25 +504,25 @@ void turnLeft(byte turns)
   if (turns % 4 == 2)
     if (getSquares(0) > 0)
     {
-      trnLeft(303, 400);
-      mve(150, 400, false);
-      trnLeft(700, 400);
+      trnLeft(300, 400);
+      mve(160, 400, false);
+      trnLeft(705, 400);
       mveBack(250, 400);
-      trnLeft(303, 400);
+      trnLeft(300, 400);
     }
     else if (getSquares(2) > 0)
     {
-      trnRight(345, 400);
-      mve(150, 400, false);
+      trnRight(350, 400);
+      mve(160, 400, false);
       trnRight(720, 400);
       mveBack(250, 400);
       trnRight(345, 400);
     }
   if (turns % 4 == 1)
   {
-    trnLeft(290, 400);
+    trnLeft(302, 400);
     mve(150, 400, false);
-    trnLeft(290, 400);
+    trnLeft(302, 400);
     mveBack(550, 400);
   }
   /*else
@@ -543,7 +556,7 @@ void moveBackOne()
 
 void moveOne()
 {
-  mve(1395, 400, true);
+  mve(1380, 400, true);
 
   switch (dir)
   {

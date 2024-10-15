@@ -1,9 +1,5 @@
 # CA Micromouse
 
-Add important reference info here.
+This code is for Columbus Academy's micromouse robot, competing in the National Robotics Challenge.
 
-# Accessing the Kanban Board
-
-1. Open the projects tab in the horizontal menu above.
-2. Click on "projects", right below "projects (beta)".
-3. Click "CA Robotics" to open the Kanban board.
+The code is written for an arduino and is thus in C++.
